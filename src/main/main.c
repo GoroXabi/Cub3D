@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/04 11:30:41 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/04 15:09:06 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,17 +53,31 @@ uint32_t colores[] = {
 #define FOV 90
 
 
+
+typedef struct pair_double_double {
+    double first;
+    double second;
+}				t_pair_d_d;
+
+typedef struct pair_double_pair {
+    double lenght;
+    t_pair_d_d pair;
+}				t_pair_d_p;
+
+
 double	px;
 
 double	py;
 
 double	view_angle = NORTH;
 
-double rays[FOV/2];
+t_pair_d_p rays[FOV/2];
 
 int MAP_SIZE = 10;
 
 static mlx_image_t* map_image;
+
+static mlx_texture_t* wall_texture;
 
 static mlx_image_t* screen_image;
 
@@ -96,12 +110,10 @@ int MAP[10][10] = {
 
 };
 
-typedef struct pair_double_double {
-    double first;
-    double second;
-}				t_pair_d_d;
-
-
+int32_t make_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
+{
+    return (r << 24 | g << 16 | b << 8 | a);
+}
 
 void dibujar_linea(int x0, int y0, int x1, int y1)
 {
@@ -324,11 +336,6 @@ t_pair_d_d	rayo_v(int32_t x, int32_t y, double angle)
 	t_pair_d_d ret;
 	ret.first = rx;
 	ret.second = ry;
-	/*if (target_x > MAP_SIZE * 32 || target_y > MAP_SIZE * 32)
-	{
-		ret.first = HEIGHT * 2;
-		ret.second = HEIGHT * 2;
-	}*/
 	return(ret);
 }
 
@@ -392,18 +399,15 @@ t_pair_d_d	rayo_h(int32_t x, int32_t y, double angle)
 	t_pair_d_d ret;
 	ret.first = rx;
 	ret.second = ry;
-	/*if (target_x > MAP_SIZE * 32 || target_y > MAP_SIZE * 32)
-	{
-		ret.first = HEIGHT * 2;
-		ret.second = HEIGHT * 2;
-	}*/
 	return(ret);
 }
 
-double  rayo(int32_t x, int32_t y, double angle)
+t_pair_d_p  rayo(int32_t x, int32_t y, double angle)
 {
 	t_pair_d_d h;
 	t_pair_d_d v;
+
+	t_pair_d_p ret;
 
 	if (angle < 0)
 		angle += 2*M_PI;
@@ -420,9 +424,17 @@ double  rayo(int32_t x, int32_t y, double angle)
 	dv = sqrt((v.first - x) * (v.first - x) + (v.second -y) * (v.second -y));
 
 	if (dh <= dv)
-		return(fabs(dh * cos(angle - view_angle)));
+	{
+		ret.lenght = fabs(dh * cos(angle - view_angle));
+		ret.pair = h;
+		return(ret);
+	}
 	else
-		return(fabs(dv * cos(angle - view_angle)));
+	{
+		ret.lenght = fabs(dv * cos(angle - view_angle));
+		ret.pair = v;
+		return(ret);
+	}
 }
 
 void refresh_screen(void)
@@ -441,8 +453,7 @@ void print_screen(void)
 
 		for (int k = 0; k < HEIGHT; k++)
 		{
-			if (screen[i][k] == 1)
-				mlx_put_pixel(screen_image, i,  k, 0x00FF00FF);
+			mlx_put_pixel(screen_image, i,  k, screen[i][k]);
 		}
 	}
 	mlx_image_to_window(mlx, screen_image, 0, 0);
@@ -467,7 +478,7 @@ void print_walls(void)
 	
 	while (i < WIDTH)
 	{
-		wall_size = (int)HEIGHT/rays[j];
+		wall_size = ((int)HEIGHT/(double)rays[j].lenght) * 32;
 		if (wall_size > HEIGHT)
 			wall_size = HEIGHT;
 		sky_size = (HEIGHT - wall_size) / 2;
@@ -482,9 +493,18 @@ void print_walls(void)
 		printf("ray_width : [%d]\n", ray_width);
 		printf("sky_size : [%d]\n", sky_size);
 		*/
+		int red = 1;
 		while (k < (HEIGHT - sky_size))
 		{
-			screen[i][k] = 1;
+			if ((((int)(rays[j].pair.first) % 32 <= red) && ((int)(rays[j].pair.second) % 32 <= red))
+			|| (((int)(rays[j].pair.first) % 32 >= 32 - red) && ((int)(rays[j].pair.second) % 32 >= 32 - red))
+			|| (((int)(rays[j].pair.first) % 32 <= red) && ((int)(rays[j].pair.second) % 32 >= 32 - red))
+			|| (((int)(rays[j].pair.first) % 32 >= 32 - red) && ((int)(rays[j].pair.second) % 32 <= red)))
+				screen[i][k] = colores[0];
+			else
+			{
+				screen[i][k] = colores[10];
+			}
 			k++;
 		}
 		if (i && i % ray_width == 0 && j < (FOV/2) - 1)
@@ -504,68 +524,8 @@ int32_t round_if_small(double value) {
 	return((int32_t)round(value));
 }
 
-void ft_hook(void* param)
+void print()
 {
-
-	int move_distance = 1;
-
-	mlx_t* mlx = param;
-
-
-	if (mlx_is_key_down(mlx, MLX_KEY_ESCAPE))
-		mlx_close_window(mlx);
-
-
-	if (mlx_is_key_down(mlx, MLX_KEY_W))
-	{
-		double deltaX = cos(view_angle) * move_distance;
-		double deltaY = sin(view_angle) * move_distance;
-
-		px += deltaX;
-		py += deltaY;
-	}
-	if (mlx_is_key_down(mlx, MLX_KEY_S))
-	{
-		double deltaX = cos(view_angle) * move_distance;
-		double deltaY = sin(view_angle) * move_distance;
-
-		px -= deltaX;
-		py -= deltaY;
-	}
-	if (mlx_is_key_down(mlx, MLX_KEY_D))
-	{
-		double deltaX = cos(view_angle + M_PI/2) * move_distance;
-		double deltaY = sin(view_angle + M_PI/2) * move_distance;
-
-		px += deltaX;
-		py += deltaY;
-	}
-	if (mlx_is_key_down(mlx, MLX_KEY_A))
-	{
-		double deltaX = cos(view_angle + M_PI/2) * move_distance;
-		double deltaY = sin(view_angle + M_PI/2) * move_distance;
-
-		px -= deltaX;
-		py -= deltaY;
-	}
-	
-	player->instances->x = round(px);
-	player->instances->y = round(py);
-
-	if (mlx_is_key_down(mlx, MLX_KEY_LEFT))
-	{
-		view_angle -= 0.1;
-		if (view_angle < 0)
-			view_angle = 2*M_PI;	
-	}
-	
-	if (mlx_is_key_down(mlx, MLX_KEY_RIGHT))
-	{
-		view_angle += 0.1;
-		if (view_angle > 2*M_PI)
-			view_angle = 0;
-	}
-	
 	printf( HBLU "view_angle : [%f]\n" RST, view_angle * (1 / RADIAN_TO_ANGLE));
 	printf( HRED "player_pos : (%d, %d)\n" RST, player->instances[0].x, player->instances[0].y);
 
@@ -583,7 +543,74 @@ void ft_hook(void* param)
 	}
 	
 	print_walls();
+}
 
+void ft_hook(void* param)
+{
+
+	int move_distance = 1;
+
+	mlx_t* mlx = param;
+
+
+	if (mlx_is_key_down(mlx, MLX_KEY_ESCAPE))
+		mlx_close_window(mlx);
+
+	if (mlx_is_key_down(mlx, MLX_KEY_W))
+	{
+		double deltaX = cos(view_angle) * move_distance;
+		double deltaY = sin(view_angle) * move_distance;
+
+		px += deltaX;
+		py += deltaY;
+		print();
+	}
+	if (mlx_is_key_down(mlx, MLX_KEY_S))
+	{
+		double deltaX = cos(view_angle) * move_distance;
+		double deltaY = sin(view_angle) * move_distance;
+
+		px -= deltaX;
+		py -= deltaY;
+		print();
+	}
+	if (mlx_is_key_down(mlx, MLX_KEY_D))
+	{
+		double deltaX = cos(view_angle + M_PI/2) * move_distance;
+		double deltaY = sin(view_angle + M_PI/2) * move_distance;
+
+		px += deltaX;
+		py += deltaY;
+		print();
+	}
+	if (mlx_is_key_down(mlx, MLX_KEY_A))
+	{
+		double deltaX = cos(view_angle + M_PI/2) * move_distance;
+		double deltaY = sin(view_angle + M_PI/2) * move_distance;
+
+		px -= deltaX;
+		py -= deltaY;
+		print();
+	}
+	
+	player->instances->x = round(px);
+	player->instances->y = round(py);
+
+	if (mlx_is_key_down(mlx, MLX_KEY_LEFT))
+	{
+		view_angle -= 0.1;
+		if (view_angle < 0)
+			view_angle = 2*M_PI;
+		print();
+	}
+	
+	if (mlx_is_key_down(mlx, MLX_KEY_RIGHT))
+	{
+		view_angle += 0.1;
+		if (view_angle > 2*M_PI)
+			view_angle = 0;
+		print();
+	}
 }
 
 int32_t main(void)
@@ -616,6 +643,13 @@ int32_t main(void)
 	px = player->instances[0].x;
 	py = player->instances[0].y;
 	
+	wall_texture = mlx_load_png("minecra.png");
+	for (int i = 0; i < 32 * 4; i++)
+	{
+		for (int k = 0; k < 32 * 4; k++)
+			printf("[%d]", wall_texture->pixels[i + k]);
+		printf("\n");
+	}
 
 	mlx_loop_hook(mlx, ft_hook, mlx);
 	//ft_hook(mlx);
