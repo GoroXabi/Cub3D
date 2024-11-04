@@ -6,7 +6,7 @@
 #    By: xortega <xortega@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/05 11:02:31 by xortega           #+#    #+#              #
-#    Updated: 2024/11/04 11:41:36 by xortega          ###   ########.fr        #
+#    Updated: 2024/11/04 12:16:39 by xortega          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -82,6 +82,7 @@ fclean:
 	@rm -fr $(OBJ_DIR)
 	@rm -f $(NAME)
 	@rm -f $(MLX)
+	@rm -fr $(MLX_PATH)
 	@rm -f $(LIBFT)
 	@make fclean -C $(LIBFT_PATH)
 	
