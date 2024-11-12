@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
+/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/07 13:16:23 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/12 13:16:50 by xabier           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#define WIDTH 1280
-#define HEIGHT 1280
+#define WIDTH 720
+#define HEIGHT 720
 #define M_PI   3.14159265358979323846
 
 uint32_t colores[] = {
@@ -36,6 +36,10 @@ uint32_t colores[] = {
     0x800080FF, // Púrpura (ARGB)
     0xA52A2AFF  // Marrón (ARGB)
 };
+
+uint32_t sky_color = 0xFFA500FF;
+
+uint32_t floor_color = 0x800080FF;
 
 #define HRED	"\033[91m"
 #define HBLU	"\033[94m"
@@ -80,12 +84,10 @@ static mlx_image_t* map_image;
 
 static mlx_texture_t* north_texture;
 static mlx_texture_t* south_texture;
-//static mlx_texture_t* east_texture;
-//static mlx_texture_t* west_texture;
+static mlx_texture_t* east_texture;
+static mlx_texture_t* west_texture;
 
 static mlx_image_t* screen_image;
-
-static mlx_image_t* ray_image;
 
 static mlx_image_t* player;
 
@@ -116,6 +118,10 @@ int32_t n_texture[32][32];
 
 int32_t s_texture[32][32];
 
+int32_t e_texture[32][32];
+
+int32_t w_texture[32][32];
+
 int32_t make_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
     return (r << 24 | g << 16 | b << 8 | a);
@@ -135,34 +141,6 @@ void make_texture(mlx_texture_t* texture, int32_t m_texture[32][32])
 			m_texture[x][y] = make_pixel(texture->pixels[k + 0], texture->pixels[k + 1], texture->pixels[k + 2], texture->pixels[k + 3]);
 		}
 	}
-}
-
-void dibujar_linea(int x0, int y0, int x1, int y1)
-{
-
-	if (!ray_image)
-		return ;
-
-    int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
-    int sx = (x0 < x1) ? 1 : -1;
-    int sy = (y0 < y1) ? 1 : -1;
-    int err = dx - dy;
-
-    while (1)
-	{
-		mlx_put_pixel(ray_image, x0, y0, 0xFFFFFFFF); // Dibuja el pixel
-        if (x0 == x1 && y0 == y1) break;
-        int err2 = err * 2;
-        if (err2 > -dy) {
-            err -= dy;
-            x0 += sx;
-        }
-        if (err2 < dx) {
-            err += dx;
-            y0 += sy;
-        }
-    }
 }
 
 void make_player(uint32_t color)
@@ -455,10 +433,10 @@ void print_walls(void)
 
 
 	int i = 0;
-	int k = 0;
 	
 	while (i < WIDTH)
 	{
+		int k = 0;
 		int j = 0;
 		wall_size = (HEIGHT/rays[i].lenght) * 32;
 		if (wall_size > HEIGHT)
@@ -467,7 +445,11 @@ void print_walls(void)
 			wall_size = HEIGHT;
 		}
 		sky_size = (HEIGHT - wall_size) / 2;
-		k = sky_size;
+		while (k < sky_size)
+		{
+			screen[i][k] = sky_color;
+			k++;
+		}
 		int col;
 
 		if (rays[i].type == 'h')
@@ -476,10 +458,19 @@ void print_walls(void)
 			col = (int)(rays[i].pair.second) % 32;
 		while (k < (HEIGHT - sky_size))
 		{
-			if (rays[i].angle < M_PI)
+			if (rays[i].angle < M_PI && rays[i].type == 'h')	
 				screen[i][k] = n_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
-			else
+			if ((rays[i].angle < M_PI/2 || rays[i].angle > M_PI * 3/2) && rays[i].type == 'v')
+				screen[i][k] = e_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			if (rays[i].angle > M_PI && rays[i].type == 'h')
 				screen[i][k] = s_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			if ((rays[i].angle > M_PI/2 && rays[i].angle < M_PI * 3/2) && rays[i].type == 'v')
+				screen[i][k] = w_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			k++;
+		}
+		while (k < HEIGHT)
+		{
+			screen[i][k] = floor_color;
 			k++;
 		}
 		i++;
@@ -617,12 +608,13 @@ int32_t main(void)
 	
 	north_texture = mlx_load_png("minecra.png");
 	south_texture = mlx_load_png("TPG.png");
-	printf("texture:info\ntexture heigth: %d\ntexture width: %d\n", north_texture->height, north_texture->width);
-	printf("MAX_DEPTH: %f\n", MAX_DEPTH);
+	east_texture = mlx_load_png("tom.png");
+	west_texture = mlx_load_png("syl.png");
 	make_texture(north_texture, n_texture);
 	make_texture(south_texture, s_texture);
+	make_texture(east_texture, e_texture);
+	make_texture(west_texture, w_texture);
 	mlx_loop_hook(mlx, ft_hook, mlx);
-	//ft_hook(mlx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	return (EXIT_SUCCESS);
