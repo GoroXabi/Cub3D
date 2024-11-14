@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:49:38 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/14 16:42:39 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/14 17:42:02 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,10 @@
 #define HMAG	"\033[95m"
 #define RST		"\033[0m"
 
+int32_t     **make_texture(mlx_texture_t* texture);
+
+void        print_walls(t_data *data);
 
 t_pair_d_p  rayo(t_data *data, double angle);
-
+void        ray_maker(t_data *data);
 #endif

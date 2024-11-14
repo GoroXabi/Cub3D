@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 10:47:29 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/14 17:22:17 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/14 17:36:43 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ typedef struct data {
 		//MLX
 		mlx_t* mlx;
 		mlx_image_t* screen_image;
-		mlx_image_t* player;
 
 		//TEXTURES
 		mlx_texture_t* north_texture;
