@@ -6,7 +6,7 @@
 #    By: xortega <xortega@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/05 11:02:31 by xortega           #+#    #+#              #
-#    Updated: 2024/11/04 12:16:39 by xortega          ###   ########.fr        #
+#    Updated: 2024/11/13 11:09:04 by xortega          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,8 +24,11 @@ CFLAGS		:=	-Wextra -Wall -Werror -Wunreachable-code -Ofast -Iincludes -g3
 
 # SRCS #
 MAIN		:= main
+RAYS	 	:= rays
 
-PLAIN_SRCS 	:= $(addsuffix .c, $(addprefix main/,		$(MAIN)))
+
+PLAIN_SRCS 	:=	$(addsuffix .c, $(addprefix main/,	$(MAIN))) \
+				$(addsuffix .c, $(addprefix rays/,	$(RAYS)))
 
 SRCS 		:= $(addprefix $(SRC_PATH), $(PLAIN_SRCS))
 OBJS 		:= $(addprefix $(OBJ_DIR), $(PLAIN_SRCS:.c=.o))
@@ -49,8 +52,6 @@ WHITEB=\033[48;5;255m
 CYANB=\033[48;5;6m
 PINKB=\033[48;5;213m
 
-
-
 all: $(NAME)
 
 $(NAME): $(OBJS) $(LIBFT) $(MLX)
@@ -70,13 +71,11 @@ $(LIBFT):
 
 $(MLX):
 	@cmake $(LIBMLX) -B $(LIBMLX)/build && make -C $(LIBMLX)/build -j4
-	mv $(MLX_PATH)/$(MLX) ./
+	@mv $(MLX_PATH)/$(MLX) ./
+
 clean:
 	@rm -fr $(OBJ_DIR)
 	@make clean -C $(LIBFT_PATH)
-
-ascii:
-
 
 fclean:
 	@rm -fr $(OBJ_DIR)

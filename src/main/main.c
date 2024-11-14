@@ -3,147 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/12 13:16:50 by xabier           ###   ########.fr       */
+/*   Updated: 2024/11/14 17:27:23 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "cubed.h"
-
-
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-#define WIDTH 720
-#define HEIGHT 720
-#define M_PI   3.14159265358979323846
-
-uint32_t colores[] = {
-    0xFF0000FF, // Rojo (ARGB)
-    0x00FF00FF, // Verde (ARGB)
-    0x0000FFFF, // Azul (ARGB)
-    0xFFFF00FF, // Amarillo (ARGB)
-    0xFF00FFFF, // Magenta (ARGB)
-    0x00FFFFFF, // Cian (ARGB)
-    0xFFFFFFFF, // Blanco (ARGB)
-    0x000000FF, // Negro (ARGB)
-    0x808080FF, // Gris (ARGB)
-    0xFFA500FF, // Naranja (ARGB)
-    0x800080FF, // Púrpura (ARGB)
-    0xA52A2AFF  // Marrón (ARGB)
-};
-
-uint32_t sky_color = 0xFFA500FF;
-
-uint32_t floor_color = 0x800080FF;
-
-#define HRED	"\033[91m"
-#define HBLU	"\033[94m"
-#define HGRE	"\033[92m"
-#define HMAG	"\033[95m"
-#define RST		"\033[0m"
-
-#define EAST 0
-#define NORTH M_PI/2 
-#define WEST M_PI
-#define SOUTH M_PI * 3/2
-
-#define MAX_DEPTH round(sqrt((MAP_SIZE * MAP_SIZE + MAP_SIZE * MAP_SIZE)))
-
-#define	ANGLE_TO_RADIAN 0.0174533
-
-#define FOV 60
-
-typedef struct pair_double_double {
-    double first;
-    double second;
-}				t_pair_d_d;
-
-typedef struct pair_double_pair {
-    double		lenght;
-	double		angle;
-	char		type;
-    t_pair_d_d	pair;
-}				t_pair_d_p;
-
-double	px;
-
-double	py;
-
-double	view_angle = NORTH;
-
-t_pair_d_p rays[WIDTH];
-
-int MAP_SIZE = 10;
-
-static mlx_image_t* map_image;
-
-static mlx_texture_t* north_texture;
-static mlx_texture_t* south_texture;
-static mlx_texture_t* east_texture;
-static mlx_texture_t* west_texture;
-
-static mlx_image_t* screen_image;
-
-static mlx_image_t* player;
-
-static mlx_image_t* player_direction;
-
-mlx_t* mlx;
-
-// MAP[y][x]
-
-int screen[WIDTH][HEIGHT];
-
-int MAP[10][10] = {
-
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-
-};
-
-int32_t n_texture[32][32];
-
-int32_t s_texture[32][32];
-
-int32_t e_texture[32][32];
-
-int32_t w_texture[32][32];
 
 int32_t make_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
     return (r << 24 | g << 16 | b << 8 | a);
 }
 
-void make_texture(mlx_texture_t* texture, int32_t m_texture[32][32])
+int32_t **make_texture(mlx_texture_t* texture)
 {
-	int y;
-	int x;
-	int k;
+	uint32_t y;
+	uint32_t x;
+	uint32_t k;
+	int32_t **new_texture;
 	
-	for (y = 0; y < 32; y++)
+	new_texture = malloc(sizeof(int32_t *) * texture->height);
+	for (size_t i = 0; i < texture->height; i++)
 	{
-		for (x = 0; x < 32; x++)
+		new_texture[i] = malloc(sizeof(int32_t) * texture->width);
+	}
+	
+	for (y = 0; y < texture->height; y++)
+	{
+		for (x = 0; x < texture->width; x++)
 		{
-			k = y*32*4 + x*4;
-			m_texture[x][y] = make_pixel(texture->pixels[k + 0], texture->pixels[k + 1], texture->pixels[k + 2], texture->pixels[k + 3]);
+			k = y*texture->width*4 + x*4;
+			new_texture[x][y] = make_pixel(texture->pixels[k + 0], texture->pixels[k + 1], texture->pixels[k + 2], texture->pixels[k + 3]);
 		}
 	}
+	return(new_texture);
 }
 
-void make_player(uint32_t color)
+void make_player(uint32_t color, t_data *data)
 {
 	int k = 15;
 
@@ -153,284 +51,43 @@ void make_player(uint32_t color)
 
 		while (l > 0)
 		{
-			mlx_put_pixel(player, l, k, color);
+			mlx_put_pixel(data->player, l, k, color);
 			l--;
 		}
 		
 		k--;
 	}
 }
-void make_direction(void)
-{
-	int k = 7;
-
-	while (k > 0)
-	{
-		int l = 7;
-
-		while (l > 0)
-		{
-			mlx_put_pixel(player_direction, l, k, 0x00FFFFFF);
-			l--;
-		}
-		
-		k--;
-	}
-}
-
-void	print_map(mlx_t *mlx)
-{
-	
-	if (!(map_image = mlx_new_image(mlx, WIDTH, HEIGHT)))
-	{
-		mlx_close_window(mlx);
-		puts(mlx_strerror(mlx_errno));
-		exit(EXIT_FAILURE);
-	}
-
-	int col = MAP_SIZE - 1;
-
-	//make_tail(0x00FF00FF);
-	while(col >= 0)
-	{
-		int col = MAP_SIZE - 1;
-		
-		while(col >= 0)
-		{
-			if (MAP[col][col] == 1)
-			{
-				int32_t x = 0;
-				
-				while (x < 31)
-				{
-					int32_t y = 0;
-					while (y < 31)
-					{
-						mlx_put_pixel(map_image, (col * 32) + x, (col * 32) + y, 0x00FF00FF);
-						y++;
-					}
-					x++;
-				}	
-			}
-			else
-			{
-				int32_t x = 0;
-				
-				while (x < 31)
-				{
-					int32_t y = 0;
-					while (y < 31)
-					{
-						mlx_put_pixel(map_image, (col * 32) + x, (col * 32) + y, 0);
-						y++;
-					}
-					x++;
-				}	
-			}
-			col--;
-		}
-
-		col--;
-	}		
-	mlx_image_to_window(mlx, map_image, 0, 0);
-}
-
-t_pair_d_d	rayo_v(int32_t x, int32_t y, double angle)
-{
-	int depth = 0;
-	int target_x;
-	int target_y;
-
-	double rx = 0;
-	double ry = 0;
-	double ra;
-
-	double xo = 0;
-	double yo = 0;
-	
-	ra = angle;
-
-	float nTan = -tan(ra);
-
-	if (ra > M_PI / 2 && ra < M_PI * 3/2)
-	{
-		rx = ((x / 32) * 32) - 0.0001;
-		ry = (x - rx) * nTan + y;
-		xo = -32;
-		yo = -xo * nTan;
-	}
-
-	if (ra < M_PI / 2 || ra > M_PI * 3/2)
-	{
-		rx = (((x / 32) + 1) * 32);
-		ry = (x - rx) *  nTan + y;
-		xo = 32;
-		yo = -xo * nTan;
-	}
-
-	if (ra == M_PI / 2 || ra == M_PI * 3/2)
-	{
-		rx = x;
-		ry = y;
-		depth = MAX_DEPTH;
-		target_x = 0;
-		target_y = 0;
-	}
-
-	while (depth < MAX_DEPTH)
-	{
-		target_x = (int)rx / 32;
-		target_y = (int)ry / 32;
-		if (target_x >= 0 && target_x <= MAP_SIZE
-			&& target_y >= 0 && target_y <= MAP_SIZE
-				&& MAP[target_y][target_x] == 1)
-			depth = MAX_DEPTH;
-		else
-		{
-			rx += xo;
-			ry += yo;
-			depth++;
-		}
-	}
-	
-	t_pair_d_d ret;
-	ret.first = rx;
-	ret.second = ry;
-	return(ret);
-}
-
-t_pair_d_d	rayo_h(int32_t x, int32_t y, double angle)
-{
-	int depth = 0;
-	int target_x;
-	int target_y;
-
-	double rx = 0;
-	double ry = 0;
-	double ra;
-
-	double xo = 0;
-	double yo = 0;
-	
-	ra = angle;
-
-	float aTan = -1/tan(ra);
-	if (ra > M_PI)
-	{
-		ry = ((y / 32) * 32) - 0.0001;
-		rx = (y - ry) * aTan + x;
-		yo = -32;
-		xo = -yo * aTan;
-	}
-
-	if (ra < M_PI)
-	{
-		ry = (((y / 32) + 1) * 32);
-		rx = (y - ry) * aTan + x;
-		yo = 32;
-		xo = -yo * aTan;
-	}
-
-	if (ra == 0 || ra == M_PI)
-	{
-		rx = x;
-		ry = y;
-		depth = MAX_DEPTH;
-		target_x = 0;
-		target_y = 0;
-	}
-
-	while (depth < MAX_DEPTH)
-	{
-		target_x = (int)rx / 32;
-		target_y = (int)ry / 32;
-		if (target_x >= 0 && target_x <= MAP_SIZE
-			&& target_y >= 0 && target_y <= MAP_SIZE
-				&& MAP[target_y][target_x] == 1)
-			depth = MAX_DEPTH;
-		else
-		{
-			rx += xo;
-			ry += yo;
-			depth++;
-		}
-	}
-	
-	t_pair_d_d ret;
-	ret.first = rx;
-	ret.second = ry;
-	return(ret);
-}
-
-t_pair_d_p  rayo(int32_t x, int32_t y, double angle)
-{
-	t_pair_d_d h;
-	t_pair_d_d v;
-
-	t_pair_d_p ret;
-
-	if (angle < 0)
-		angle += 2*M_PI;
-	if (angle > 2*M_PI)
-		angle -= 2*M_PI;
-		
-	ret.angle = angle;
-	h = rayo_h(x, y, angle);
-	v = rayo_v(x, y, angle);
-
-	double dh;
-	double dv;
-
-	dh = sqrt((h.first - x) * (h.first - x) + (h.second -y) * (h.second -y));
-	dv = sqrt((v.first - x) * (v.first - x) + (v.second -y) * (v.second -y));
-
-	if (dh <= dv)
-	{
-		ret.lenght = fabs(dh * cos(angle - view_angle));
-		ret.pair = h;
-		ret.type = 'h';
-		return(ret);
-	}
-	else
-	{
-		ret.lenght = fabs(dv * cos(angle - view_angle));
-		ret.pair = v;
-		ret.type = 'v';
-		return(ret);
-	}
-}
-
-void refresh_screen(void)
+void refresh_screen(t_data *data)
 {
 	for (int i = 0; i < WIDTH; i++)
 		for (int k = 0; k < HEIGHT; k++)
-				mlx_put_pixel(screen_image, i,  k, 0);
-	mlx_image_to_window(mlx, screen_image, 0, 0);
+				mlx_put_pixel(data->screen_image, i,  k, 0);
+	mlx_image_to_window(data->mlx, data->screen_image, 0, 0);
 }
 
-void print_screen(void)
+void print_screen(t_data *data)
 {	
-	refresh_screen();
+	refresh_screen(data);
 	for (int i = 0; i < WIDTH; i++)
 	{
 
 		for (int k = 0; k < HEIGHT; k++)
 		{
-			mlx_put_pixel(screen_image, i,  k, screen[i][k]);
+			mlx_put_pixel(data->screen_image, i,  k, data->screen[i][k]);
 		}
 	}
 }
 
-void print_walls(void)
+void print_walls(t_data *data)
 {
 
 	for (int i = 0; i < WIDTH; i++)
 		for (int k = 0; k < HEIGHT; k++)
-			screen[i][k] = 0;
+			data->screen[i][k] = 0;
 
 	int wall_size;
 	int sky_size;
-
 
 	int i = 0;
 	
@@ -438,7 +95,7 @@ void print_walls(void)
 	{
 		int k = 0;
 		int j = 0;
-		wall_size = (HEIGHT/rays[i].lenght) * 32;
+		wall_size = (HEIGHT/data->rays[i].lenght) * 32;
 		if (wall_size > HEIGHT)
 		{
 			j = wall_size - HEIGHT;
@@ -447,64 +104,56 @@ void print_walls(void)
 		sky_size = (HEIGHT - wall_size) / 2;
 		while (k < sky_size)
 		{
-			screen[i][k] = sky_color;
+			data->screen[i][k] = data->sky_color;
 			k++;
 		}
 		int col;
 
-		if (rays[i].type == 'h')
-			col = (int)(rays[i].pair.first) % 32;
+		if (data->rays[i].type == 'h')
+			col = (int)(data->rays[i].pair.first) % 32;
 		else
-			col = (int)(rays[i].pair.second) % 32;
+			col = (int)(data->rays[i].pair.second) % 32;
 		while (k < (HEIGHT - sky_size))
 		{
-			if (rays[i].angle < M_PI && rays[i].type == 'h')	
-				screen[i][k] = n_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
-			if ((rays[i].angle < M_PI/2 || rays[i].angle > M_PI * 3/2) && rays[i].type == 'v')
-				screen[i][k] = e_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
-			if (rays[i].angle > M_PI && rays[i].type == 'h')
-				screen[i][k] = s_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
-			if ((rays[i].angle > M_PI/2 && rays[i].angle < M_PI * 3/2) && rays[i].type == 'v')
-				screen[i][k] = w_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			if (data->rays[i].angle < M_PI && data->rays[i].type == 'h')	
+				data->screen[i][k] = data->n_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			if ((data->rays[i].angle < M_PI/2 || data->rays[i].angle > M_PI * 3/2) && data->rays[i].type == 'v')
+				data->screen[i][k] = data->e_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			if (data->rays[i].angle > M_PI && data->rays[i].type == 'h')
+				data->screen[i][k] = data->s_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			if ((data->rays[i].angle > M_PI/2 && data->rays[i].angle < M_PI * 3/2) && data->rays[i].type == 'v')
+				data->screen[i][k] = data->w_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
 			k++;
 		}
 		while (k < HEIGHT)
 		{
-			screen[i][k] = floor_color;
+			data->screen[i][k] = data->floor_color;
 			k++;
 		}
 		i++;
 	}
 
-	print_screen();
+	printf("print_walls_ok\n");
+	print_screen(data);
 	
 }
 
-int32_t round_if_small(double value) {
-	if (value < 1 && value > 0.5)
-		return (1);
-	if (value < 0.5 && value > 0)
-		return (0);
-	return((int32_t)round(value));
-}
-
-void print()
+void ray_maker(t_data *data)
 {
 	int	i = 0;
 
 	double fan;
 
 
-	fan = view_angle - (FOV/2 * ANGLE_TO_RADIAN);
+	fan = data->view_angle - (FOV/2 * ANGLE_TO_RADIAN);
 
 	while (i < WIDTH)
 	{
-		rays[i] = rayo(player->instances->x, player->instances->y, fan);
+		data->rays[i] = rayo(data, fan);
 		fan += ((double)FOV / (double)WIDTH) * (double)ANGLE_TO_RADIAN;
 		i++;
 	}
-	
-	print_walls();
+	print_walls(data);
 }
 
 void ft_hook(void* param)
@@ -512,110 +161,152 @@ void ft_hook(void* param)
 
 	int move_distance = 2;
 
-	mlx_t* mlx = param;
+	t_data* data = param;
 
 
-	if (mlx_is_key_down(mlx, MLX_KEY_ESCAPE))
-		mlx_close_window(mlx);
+	if (mlx_is_key_down(data->mlx, MLX_KEY_ESCAPE))
+		mlx_close_window(data->mlx);
 
-	if (mlx_is_key_down(mlx, MLX_KEY_W))
+	if (mlx_is_key_down(data->mlx, MLX_KEY_W))
 	{
-		double deltaX = cos(view_angle) * move_distance;
-		double deltaY = sin(view_angle) * move_distance;
-
-		px += deltaX;
-		py += deltaY;
-		print();
+		data->px_position += cos(data->view_angle) * move_distance;
+		data->py_position += sin(data->view_angle) * move_distance;
+		
+		printf("(%f, %f)\n", data->px_position, data->py_position);
+		ray_maker(data);
 	}
-	if (mlx_is_key_down(mlx, MLX_KEY_S))
+	if (mlx_is_key_down(data->mlx, MLX_KEY_S))
 	{
-		double deltaX = cos(view_angle) * move_distance;
-		double deltaY = sin(view_angle) * move_distance;
-
-		px -= deltaX;
-		py -= deltaY;
-		print();
+		data->px_position -= cos(data->view_angle) * move_distance;
+		data->py_position -= sin(data->view_angle) * move_distance;
+		
+		printf("(%f, %f)\n", data->px_position, data->py_position);
+		ray_maker(data);
 	}
-	if (mlx_is_key_down(mlx, MLX_KEY_D))
+	if (mlx_is_key_down(data->mlx, MLX_KEY_D))
 	{
-		double deltaX = cos(view_angle + M_PI/2) * move_distance;
-		double deltaY = sin(view_angle + M_PI/2) * move_distance;
-
-		px += deltaX;
-		py += deltaY;
-		print();
+		data->px_position += cos(data->view_angle + M_PI/2) * move_distance;
+		data->py_position += sin(data->view_angle + M_PI/2) * move_distance;
+		
+		printf("(%f, %f)\n", data->px_position, data->py_position);
+		ray_maker(data);
 	}
-	if (mlx_is_key_down(mlx, MLX_KEY_A))
+	if (mlx_is_key_down(data->mlx, MLX_KEY_A))
 	{
-		double deltaX = cos(view_angle + M_PI/2) * move_distance;
-		double deltaY = sin(view_angle + M_PI/2) * move_distance;
-
-		px -= deltaX;
-		py -= deltaY;
-		print();
+		data->px_position -= cos(data->view_angle + M_PI/2) * move_distance;
+		data->py_position -= sin(data->view_angle + M_PI/2) * move_distance;
+		
+		printf("(%f, %f)\n", data->px_position, data->py_position);
+		ray_maker(data);
 	}
-	
-	player->instances->x = round(px);
-	player->instances->y = round(py);
-
-	if (mlx_is_key_down(mlx, MLX_KEY_LEFT))
+	if (mlx_is_key_down(data->mlx, MLX_KEY_LEFT))
 	{
-		view_angle -= 0.1;
-		if (view_angle < 0)
-			view_angle = 2*M_PI;
-		print();
+		data->view_angle -= 0.1;
+		if (data->view_angle < 0)
+			data->view_angle = 2 * M_PI;
+		
+		printf("(%f, %f)\n", data->px_position, data->py_position);
+		ray_maker(data);
 	}
 	
-	if (mlx_is_key_down(mlx, MLX_KEY_RIGHT))
+	if (mlx_is_key_down(data->mlx, MLX_KEY_RIGHT))
 	{
-		view_angle += 0.1;
-		if (view_angle > 2*M_PI)
-			view_angle = 0;
-		print();
+		data->view_angle += 0.1;
+		if (data->view_angle > 2 * M_PI)
+			data->view_angle = 0;
+		ray_maker(data);
 	}
 }
 
+void free_textures(int32_t **texture, int height)
+{
+	int i;
+	
+	i = 0;
+	while (i < height)
+	{
+		free(texture[i]);
+		i++;
+	}
+	free(texture);
+}
+
+void free_data(t_data *data)
+{
+	mlx_delete_image(data->mlx, data->screen_image);
+	mlx_delete_image(data->mlx, data->player);
+	free_textures(data->n_texture, data->north_texture->height);
+	free_textures(data->s_texture, data->south_texture->height);
+	free_textures(data->e_texture, data->east_texture->height);
+	free_textures(data->w_texture, data->west_texture->height);
+	mlx_delete_texture(data->north_texture);
+	mlx_delete_texture(data->south_texture);
+	mlx_delete_texture(data->east_texture);
+	mlx_delete_texture(data->west_texture);
+	
+}
+
+void malloc_data(t_data *data)
+{
+	data->mlx = malloc(sizeof(mlx_t));
+	
+	data->screen_image = malloc(sizeof(mlx_image_t));
+	data->player = malloc(sizeof(mlx_image_t));
+}
+
+void init_data(t_data *data)
+{
+	//malloc_data(data);
+	//printf("malloc_ok\n");
+	//INIT INFO
+	data->start_x = 75;
+	data->start_y = 75;
+	data->map_width = 10;
+	data->map_height = 10;
+	data->sky_color = 0xFFA500FF;
+	data->floor_color = 0x800080FF;
+	printf("init_info_ok\n");
+	//MLX
+	data->mlx =  mlx_init(WIDTH, HEIGHT, "MLX42", false);
+	data->screen_image = mlx_new_image(data->mlx, WIDTH, HEIGHT);
+	data->player =  mlx_new_image(data->mlx, data->start_y, data->start_x);
+	printf("mlx_ok\n");
+	//TEXTURE
+	data->north_texture = mlx_load_png("minecra.png");
+	data->south_texture = mlx_load_png("TPG.png");
+	data->east_texture = mlx_load_png("tom.png");
+	data->west_texture = mlx_load_png("syl.png");
+	data->n_texture = make_texture(data->north_texture);
+	data->s_texture = make_texture(data->south_texture);
+	data->e_texture = make_texture(data->east_texture);
+	data->w_texture = make_texture(data->west_texture);
+	printf("texture_ok\n");
+	//PLAYER_INFO
+	data->px_position = data->start_x;
+	data->py_position = data->start_y;
+	data->view_angle = NORTH;
+	printf("player_info_ok\n");
+	
+}
+
+
 int32_t main(void)
 {
-	// Gotta error check this stuff
-	if (!(mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true)))
-	{
-		puts(mlx_strerror(mlx_errno));
-		return(EXIT_FAILURE);
-	}
-		
-
-	if (!(screen_image = mlx_new_image(mlx, WIDTH, HEIGHT)))
-	{
-		mlx_close_window(mlx);
-		puts(mlx_strerror(mlx_errno));
-		return(EXIT_FAILURE);
-	}
+	t_data *data;
 	
-	if (!(player = mlx_new_image(mlx, 16, 16)))
-	{
-		mlx_close_window(mlx);
-		puts(mlx_strerror(mlx_errno));
-		return(EXIT_FAILURE);
-	}
-	make_player(0xFF0000FF * 0);
-	mlx_image_to_window(mlx, player, 32 * 5, 32 * 5);
-	mlx_image_to_window(mlx, screen_image, 0, 0);
+	data = malloc(sizeof(t_data));
+	init_data(data);
+	printf("init_ok\n");
+	mlx_image_to_window(data->mlx, data->player, 32 * 5, 32 * 5);
+	mlx_image_to_window(data->mlx, data->screen_image, 0, 0);
+	printf("image_to_window_ok\n");
 	//print_map(mlx);
 
-	px = player->instances[0].x;
-	py = player->instances[0].y;
-	
-	north_texture = mlx_load_png("minecra.png");
-	south_texture = mlx_load_png("TPG.png");
-	east_texture = mlx_load_png("tom.png");
-	west_texture = mlx_load_png("syl.png");
-	make_texture(north_texture, n_texture);
-	make_texture(south_texture, s_texture);
-	make_texture(east_texture, e_texture);
-	make_texture(west_texture, w_texture);
-	mlx_loop_hook(mlx, ft_hook, mlx);
-	mlx_loop(mlx);
-	mlx_terminate(mlx);
+	ray_maker(data);
+	mlx_loop_hook(data->mlx, ft_hook, data);
+	mlx_loop(data->mlx);
+	free_data(data);
+	mlx_terminate(data->mlx);
+	free(data);
 	return (EXIT_SUCCESS);
 }
