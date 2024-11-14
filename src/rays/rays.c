@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 09:22:35 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/14 17:00:39 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/14 17:38:41 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,4 +190,21 @@ t_pair_d_p  rayo(t_data *data, double angle)
 		ret.type = 'v';
 		return(ret);
 	}
+}
+void ray_maker(t_data *data)
+{
+	int	i = 0;
+
+	double fan;
+
+
+	fan = data->view_angle - (FOV/2 * ANGLE_TO_RADIAN);
+
+	while (i < WIDTH)
+	{
+		data->rays[i] = rayo(data, fan);
+		fan += ((double)FOV / (double)WIDTH) * (double)ANGLE_TO_RADIAN;
+		i++;
+	}
+	print_walls(data);
 }

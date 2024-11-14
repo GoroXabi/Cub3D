@@ -6,58 +6,12 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/14 17:27:23 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/14 17:44:27 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "cubed.h"
+#include "cubed.h"
 
-int32_t make_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
-{
-    return (r << 24 | g << 16 | b << 8 | a);
-}
-
-int32_t **make_texture(mlx_texture_t* texture)
-{
-	uint32_t y;
-	uint32_t x;
-	uint32_t k;
-	int32_t **new_texture;
-	
-	new_texture = malloc(sizeof(int32_t *) * texture->height);
-	for (size_t i = 0; i < texture->height; i++)
-	{
-		new_texture[i] = malloc(sizeof(int32_t) * texture->width);
-	}
-	
-	for (y = 0; y < texture->height; y++)
-	{
-		for (x = 0; x < texture->width; x++)
-		{
-			k = y*texture->width*4 + x*4;
-			new_texture[x][y] = make_pixel(texture->pixels[k + 0], texture->pixels[k + 1], texture->pixels[k + 2], texture->pixels[k + 3]);
-		}
-	}
-	return(new_texture);
-}
-
-void make_player(uint32_t color, t_data *data)
-{
-	int k = 15;
-
-	while (k > 0)
-	{
-		int l = 15;
-
-		while (l > 0)
-		{
-			mlx_put_pixel(data->player, l, k, color);
-			l--;
-		}
-		
-		k--;
-	}
-}
 void refresh_screen(t_data *data)
 {
 	for (int i = 0; i < WIDTH; i++)
@@ -138,24 +92,6 @@ void print_walls(t_data *data)
 	
 }
 
-void ray_maker(t_data *data)
-{
-	int	i = 0;
-
-	double fan;
-
-
-	fan = data->view_angle - (FOV/2 * ANGLE_TO_RADIAN);
-
-	while (i < WIDTH)
-	{
-		data->rays[i] = rayo(data, fan);
-		fan += ((double)FOV / (double)WIDTH) * (double)ANGLE_TO_RADIAN;
-		i++;
-	}
-	print_walls(data);
-}
-
 void ft_hook(void* param)
 {
 
@@ -234,7 +170,6 @@ void free_textures(int32_t **texture, int height)
 void free_data(t_data *data)
 {
 	mlx_delete_image(data->mlx, data->screen_image);
-	mlx_delete_image(data->mlx, data->player);
 	free_textures(data->n_texture, data->north_texture->height);
 	free_textures(data->s_texture, data->south_texture->height);
 	free_textures(data->e_texture, data->east_texture->height);
@@ -246,31 +181,17 @@ void free_data(t_data *data)
 	
 }
 
-void malloc_data(t_data *data)
-{
-	data->mlx = malloc(sizeof(mlx_t));
-	
-	data->screen_image = malloc(sizeof(mlx_image_t));
-	data->player = malloc(sizeof(mlx_image_t));
-}
-
 void init_data(t_data *data)
 {
-	//malloc_data(data);
-	//printf("malloc_ok\n");
-	//INIT INFO
 	data->start_x = 75;
 	data->start_y = 75;
 	data->map_width = 10;
 	data->map_height = 10;
 	data->sky_color = 0xFFA500FF;
 	data->floor_color = 0x800080FF;
-	printf("init_info_ok\n");
 	//MLX
 	data->mlx =  mlx_init(WIDTH, HEIGHT, "MLX42", false);
 	data->screen_image = mlx_new_image(data->mlx, WIDTH, HEIGHT);
-	data->player =  mlx_new_image(data->mlx, data->start_y, data->start_x);
-	printf("mlx_ok\n");
 	//TEXTURE
 	data->north_texture = mlx_load_png("minecra.png");
 	data->south_texture = mlx_load_png("TPG.png");
@@ -280,12 +201,10 @@ void init_data(t_data *data)
 	data->s_texture = make_texture(data->south_texture);
 	data->e_texture = make_texture(data->east_texture);
 	data->w_texture = make_texture(data->west_texture);
-	printf("texture_ok\n");
 	//PLAYER_INFO
 	data->px_position = data->start_x;
 	data->py_position = data->start_y;
 	data->view_angle = NORTH;
-	printf("player_info_ok\n");
 	
 }
 
@@ -297,10 +216,8 @@ int32_t main(void)
 	data = malloc(sizeof(t_data));
 	init_data(data);
 	printf("init_ok\n");
-	mlx_image_to_window(data->mlx, data->player, 32 * 5, 32 * 5);
 	mlx_image_to_window(data->mlx, data->screen_image, 0, 0);
 	printf("image_to_window_ok\n");
-	//print_map(mlx);
 
 	ray_maker(data);
 	mlx_loop_hook(data->mlx, ft_hook, data);

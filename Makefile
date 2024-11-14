@@ -6,7 +6,7 @@
 #    By: xortega <xortega@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/05 11:02:31 by xortega           #+#    #+#              #
-#    Updated: 2024/11/13 11:09:04 by xortega          ###   ########.fr        #
+#    Updated: 2024/11/14 17:43:25 by xortega          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,10 +25,12 @@ CFLAGS		:=	-Wextra -Wall -Werror -Wunreachable-code -Ofast -Iincludes -g3
 # SRCS #
 MAIN		:= main
 RAYS	 	:= rays
+PARSING	 	:= parsing
 
 
-PLAIN_SRCS 	:=	$(addsuffix .c, $(addprefix main/,	$(MAIN))) \
-				$(addsuffix .c, $(addprefix rays/,	$(RAYS)))
+PLAIN_SRCS 	:=	$(addsuffix .c, $(addprefix main/,		$(MAIN))) \
+				$(addsuffix .c, $(addprefix rays/,		$(RAYS))) \
+				$(addsuffix .c, $(addprefix parsing/,	$(PARSING)))
 
 SRCS 		:= $(addprefix $(SRC_PATH), $(PLAIN_SRCS))
 OBJS 		:= $(addprefix $(OBJ_DIR), $(PLAIN_SRCS:.c=.o))
