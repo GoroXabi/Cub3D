@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:49:38 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/14 17:42:02 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/15 13:39:48 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@
 
 #define MAX_DEPTH round(sqrt((10 * 10 + 10 * 10)))
 
-#define WIDTH 1920
-#define HEIGHT 1080
 #define M_PI   3.14159265358979323846
 
 #define EAST 0

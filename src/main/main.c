@@ -6,23 +6,14 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/14 17:44:27 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/15 13:52:22 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cubed.h"
 
-void refresh_screen(t_data *data)
-{
-	for (int i = 0; i < WIDTH; i++)
-		for (int k = 0; k < HEIGHT; k++)
-				mlx_put_pixel(data->screen_image, i,  k, 0);
-	mlx_image_to_window(data->mlx, data->screen_image, 0, 0);
-}
-
 void print_screen(t_data *data)
-{	
-	refresh_screen(data);
+{
 	for (int i = 0; i < WIDTH; i++)
 	{
 
@@ -35,11 +26,6 @@ void print_screen(t_data *data)
 
 void print_walls(t_data *data)
 {
-
-	for (int i = 0; i < WIDTH; i++)
-		for (int k = 0; k < HEIGHT; k++)
-			data->screen[i][k] = 0;
-
 	int wall_size;
 	int sky_size;
 
@@ -55,28 +41,27 @@ void print_walls(t_data *data)
 			j = wall_size - HEIGHT;
 			wall_size = HEIGHT;
 		}
-		sky_size = (HEIGHT - wall_size) / 2;
+		sky_size = (HEIGHT - wall_size) / 2 + ((HEIGHT - wall_size) % 2);
 		while (k < sky_size)
 		{
 			data->screen[i][k] = data->sky_color;
 			k++;
 		}
 		int col;
-
 		if (data->rays[i].type == 'h')
 			col = (int)(data->rays[i].pair.first) % 32;
 		else
 			col = (int)(data->rays[i].pair.second) % 32;
 		while (k < (HEIGHT - sky_size))
 		{
-			if (data->rays[i].angle < M_PI && data->rays[i].type == 'h')	
-				data->screen[i][k] = data->n_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+			if (data->rays[i].angle < M_PI && data->rays[i].type == 'h')
+				data->screen[i][k] = data->n_texture[col][((k - sky_size + j / 2) * 32)/(wall_size + j)];
 			if ((data->rays[i].angle < M_PI/2 || data->rays[i].angle > M_PI * 3/2) && data->rays[i].type == 'v')
-				data->screen[i][k] = data->e_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+				data->screen[i][k] = data->e_texture[col][((k - sky_size + j / 2) * 32)/(wall_size + j)];
 			if (data->rays[i].angle > M_PI && data->rays[i].type == 'h')
-				data->screen[i][k] = data->s_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+				data->screen[i][k] = data->s_texture[col][((k - sky_size + j / 2) * 32)/(wall_size + j)];
 			if ((data->rays[i].angle > M_PI/2 && data->rays[i].angle < M_PI * 3/2) && data->rays[i].type == 'v')
-				data->screen[i][k] = data->w_texture[col][((k - sky_size + j / 2) *32)/(wall_size + j)];
+				data->screen[i][k] = data->w_texture[col][((k - sky_size + j / 2) * 32)/(wall_size + j)];
 			k++;
 		}
 		while (k < HEIGHT)
@@ -86,8 +71,6 @@ void print_walls(t_data *data)
 		}
 		i++;
 	}
-
-	printf("print_walls_ok\n");
 	print_screen(data);
 	
 }
@@ -95,7 +78,7 @@ void print_walls(t_data *data)
 void ft_hook(void* param)
 {
 
-	int move_distance = 2;
+	double move_distance = 2;
 
 	t_data* data = param;
 
@@ -107,32 +90,24 @@ void ft_hook(void* param)
 	{
 		data->px_position += cos(data->view_angle) * move_distance;
 		data->py_position += sin(data->view_angle) * move_distance;
-		
-		printf("(%f, %f)\n", data->px_position, data->py_position);
 		ray_maker(data);
 	}
 	if (mlx_is_key_down(data->mlx, MLX_KEY_S))
 	{
 		data->px_position -= cos(data->view_angle) * move_distance;
 		data->py_position -= sin(data->view_angle) * move_distance;
-		
-		printf("(%f, %f)\n", data->px_position, data->py_position);
 		ray_maker(data);
 	}
 	if (mlx_is_key_down(data->mlx, MLX_KEY_D))
 	{
 		data->px_position += cos(data->view_angle + M_PI/2) * move_distance;
 		data->py_position += sin(data->view_angle + M_PI/2) * move_distance;
-		
-		printf("(%f, %f)\n", data->px_position, data->py_position);
 		ray_maker(data);
 	}
 	if (mlx_is_key_down(data->mlx, MLX_KEY_A))
 	{
 		data->px_position -= cos(data->view_angle + M_PI/2) * move_distance;
 		data->py_position -= sin(data->view_angle + M_PI/2) * move_distance;
-		
-		printf("(%f, %f)\n", data->px_position, data->py_position);
 		ray_maker(data);
 	}
 	if (mlx_is_key_down(data->mlx, MLX_KEY_LEFT))
@@ -140,8 +115,6 @@ void ft_hook(void* param)
 		data->view_angle -= 0.1;
 		if (data->view_angle < 0)
 			data->view_angle = 2 * M_PI;
-		
-		printf("(%f, %f)\n", data->px_position, data->py_position);
 		ray_maker(data);
 	}
 	
@@ -177,8 +150,7 @@ void free_data(t_data *data)
 	mlx_delete_texture(data->north_texture);
 	mlx_delete_texture(data->south_texture);
 	mlx_delete_texture(data->east_texture);
-	mlx_delete_texture(data->west_texture);
-	
+	mlx_delete_texture(data->west_texture);	
 }
 
 void init_data(t_data *data)
