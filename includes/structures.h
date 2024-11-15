@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 10:47:29 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/14 17:36:43 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/15 13:49:25 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 #ifndef STRUCTURES_H
 # define STRUCTURES_H
 
-#ifndef WIDTH
-#define WIDTH 1920
-#endif
+# ifndef WIDTH
+#  define WIDTH 1920
+# endif
 
-#ifndef HEIGTH
-#define HEIGHT 1080
-#endif
+# ifndef HEIGTH
+#  define HEIGHT 1080
+# endif
 
 typedef struct pair_double_double {
 	double first;
