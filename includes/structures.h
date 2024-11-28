@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 10:47:29 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/20 12:01:10 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/28 16:10:01 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,15 +37,15 @@ typedef struct pair_double_pair
 
 typedef struct texture
 {
-	int		**texture;
-	int		height;
-	int		width;
+	int32_t		**texture;
+	int			height;
+	int			width;
 }					t_texture;
-
 
 typedef struct data
 {
 	//INIT INFO
+	int				**map;
 	uint32_t		start_x;
 	uint32_t		start_y;
 	int				map_width;
@@ -69,6 +69,7 @@ typedef struct data
 	t_texture		*w_texture;
 
 	//PLAYER_INFO
+	int				fov;
 	double			speed;
 	double			px_p;
 	double			py_p;

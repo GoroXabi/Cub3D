@@ -6,106 +6,123 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/20 12:07:57 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/28 16:08:56 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cubed.h"
 
-void	print_screen(t_data *data)
-{
-	int	i;
-	int	k;
-
-	i = 0;
-	while (i < WIDTH)
-	{
-		k = 0;
-		while (k < HEIGHT)
-		{
-			mlx_put_pixel(data->screen_image, i, k, data->screen[i][k]);
-			k++;
-		}
-		i++;
-	}
-}
-
-void	paco_sainz(t_data *data, int row, int wall_size, int zoom)
-{
-	int	col;
-	int	pixel;
-	int	start;
-	int	sky_size;
-
-	sky_size = (HEIGHT - wall_size) / 2 + ((HEIGHT - wall_size) % 2);
-	if (data->rays[row].type == 'h')
-		col = (int)(data->rays[row].pair.first) % 32;
-	else
-		col = (int)(data->rays[row].pair.second) % 32;
-	start = sky_size - 1;
-	while (++start < (HEIGHT - sky_size))
-	{
-		pixel = ((start - sky_size + zoom / 2) * 32) / (wall_size + zoom);
-		if (data->rays[row].angle < PI && data->rays[row].type == 'h')
-			data->screen[row][start] = data->n_texture->texture[col][pixel];
-		if (data->rays[row].angle > PI && data->rays[row].type == 'h')
-			data->screen[row][start] = data->s_texture->texture[col][pixel];
-		if ((data->rays[row].angle < PI / 2
-				|| data->rays[row].angle > PI3H) && data->rays[row].type == 'v')
-			data->screen[row][start] = data->e_texture->texture[col][pixel];
-		if ((data->rays[row].angle > PI / 2
-				&& data->rays[row].angle < PI3H) && data->rays[row].type == 'v')
-			data->screen[row][start] = data->w_texture->texture[col][pixel];
-	}
-}
-
-void	art_attack(t_data *data, int row, int sky_size, int wall_size)
+void	art_attack(t_data *data, int col)
 {
 	int	start;
 
 	start = 0;
-	while (start < sky_size)
+	while (start < HEIGHT / 2)
 	{
-		data->screen[row][start] = data->sky_color;
+		mlx_put_pixel(data->screen_image, col, start, data->sky_color);
 		start++;
 	}
-	start += wall_size;
 	while (start < HEIGHT)
 	{
-		data->screen[row][start] = data->floor_color;
+		mlx_put_pixel(data->screen_image, col, start, data->floor_color);
 		start++;
 	}
 }
 
-void	print_walls(t_data *data)
+void	print_walls(t_data *data, int col, int wall_size, int zoom)
+{
+	int		start;
+	int		sky_size;
+	int		tx;
+	int		ty;
+	double	medium;
+
+	sky_size = (HEIGHT - wall_size) / 2 + ((HEIGHT - wall_size) % 2);
+	start = 0;
+	while (start < wall_size)
+	{
+		if (data->rays[col].angle < PI && data->rays[col].type == 'h')
+		{
+			medium = data->rays[col].pair.first * data->n_texture->width / 32;
+			tx = (int)medium % data->n_texture->width;
+			ty = ((start + zoom / 2) * data->n_texture->height)
+				/ (wall_size + zoom);
+			if (data->n_texture->texture[ty][data->n_texture->width - tx]
+				& 0xFF)
+				mlx_put_pixel(data->screen_image, col, start + sky_size,
+					data->n_texture->texture[ty][data->n_texture->width - tx]);
+		}
+		if (data->rays[col].angle > PI && data->rays[col].type == 'h')
+		{
+			medium = data->rays[col].pair.first * data->s_texture->width;
+			tx = (int)(medium / 32) % data->s_texture->width;
+			ty = ((start + zoom / 2) * data->s_texture->height)
+				/ (wall_size + zoom);
+			if (data->s_texture->texture[ty][tx] & 0xFF)
+				mlx_put_pixel(data->screen_image, col, start + sky_size,
+					data->s_texture->texture[ty][tx]);
+		}
+		if ((data->rays[col].angle > PIH && data->rays[col].angle < PI3H)
+			&& data->rays[col].type == 'v')
+		{
+			medium = data->rays[col].pair.second * data->w_texture->width;
+			tx = (int)(medium / 32) % data->w_texture->width;
+			ty = ((start + zoom / 2)
+					* data->w_texture->height) / (wall_size + zoom);
+			if (data->w_texture->texture[ty][data->w_texture->width - tx]
+				& 0xFF)
+				mlx_put_pixel(data->screen_image, col, start + sky_size,
+					data->w_texture->texture[ty][data->w_texture->width - tx]);
+		}
+		if ((data->rays[col].angle > PI3H || data->rays[col].angle < PIH)
+			&& data->rays[col].type == 'v')
+		{
+			medium = data->rays[col].pair.second * data->e_texture->width;
+			tx = (int)(medium / 32) % data->e_texture->width;
+			ty = ((start + zoom / 2)
+					* data->e_texture->height) / (wall_size + zoom);
+			if (data->e_texture->texture[ty][tx] & 0xFF)
+				mlx_put_pixel(data->screen_image, col, start + sky_size,
+					data->e_texture->texture[ty][tx]);
+		}
+		start++;
+	}
+}
+
+void	make_screen(t_data *data)
 {
 	int	wall_size;
 	int	zoom;
-	int	sky_size;
-	int	i;
+	int	col;
 
-	i = 0;
-	zoom = 0;
-	while (i < WIDTH)
+	col = 0;
+	while (col < WIDTH)
 	{
-		wall_size = (HEIGHT / data->rays[i].lenght) * 32;
+		zoom = 0;
+		wall_size = (HEIGHT / data->rays[col].lenght) * 64;
 		if (wall_size > HEIGHT)
 		{
 			zoom = wall_size - HEIGHT;
 			wall_size = HEIGHT;
 		}
-		paco_sainz(data, i, wall_size, zoom);
-		sky_size = (HEIGHT - wall_size) / 2 + ((HEIGHT - wall_size) % 2);
-		art_attack(data, i, sky_size, wall_size);
-		i++;
+		art_attack(data, col);
+		print_walls(data, col, wall_size, zoom);
+		col++;
 	}
-	print_screen(data);
+	//print_screen(data);
 }
-
 void	upd_p(t_data *data, double dx, double dy)
 {
-	data->px_p += dx;
-	data->py_p += dy;
+	double	deltax;
+	double	deltay;
+
+	deltax = data->px_p + dx;
+	deltay = data->py_p + dy;
+	if (data->map[(int)deltay / 32][(int)deltax / 32] != 1)
+	{
+		data->px_p += dx;
+		data->py_p += dy;
+	}
 }
 
 void	ft_hook(void *param)
@@ -131,6 +148,8 @@ void	ft_hook(void *param)
 		data->v_a = 2 * PI;
 	if (data->v_a > 2 * PI)
 		data->v_a = 0;
+	if (mlx_is_key_down(data->mlx, MLX_KEY_O))
+		printf(HBLU"player cords : (%f|%f)\n"HGRE"vision angle : (%f)\n"HRED"fov : (%d)\n", data->px_p, data->py_p, data->v_a, data->fov);
 	ray_maker(data);
 }
 
@@ -162,6 +181,22 @@ void	free_data(t_data *data)
 
 void init_data(t_data *data)
 {
+	data->map = malloc(sizeof(int *) * 10);
+	for (size_t i = 0; i < 10; i++)
+		data->map[i] = malloc(sizeof(int) * 10);
+	for (size_t i = 0; i < 10; i++)
+	{
+		data->map[0][i] = 1;
+		data->map[9][i] = 1;
+		data->map[i][0] = 1;
+		data->map[i][9] = 1;
+	}
+	data->map[4][4] = 1;
+	data->map[0][0] = 0;
+	data->map[0][9] = 0;
+	data->map[9][0] = 0;
+	data->map[9][9] = 0;
+	data->fov = 60;
 	data->start_x = 75;
 	data->start_y = 75;
 	data->map_width = 10;
@@ -170,10 +205,10 @@ void init_data(t_data *data)
 	data->floor_color = 0x800080FF;
 	data->mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
 	data->screen_image = mlx_new_image(data->mlx, WIDTH, HEIGHT);
-	data->north_texture = mlx_load_png("minecra.png");
-	data->south_texture = mlx_load_png("TPG.png");
-	data->east_texture = mlx_load_png("tom.png");
-	data->west_texture = mlx_load_png("syl.png");
+	data->north_texture = mlx_load_png("puñeta.png");
+	data->south_texture = mlx_load_png("b.png");
+	data->east_texture = mlx_load_png("aaa.png");
+	data->west_texture = mlx_load_png("emo.png");
 	data->n_texture = make_texture(data->north_texture);
 	data->s_texture = make_texture(data->south_texture);
 	data->e_texture = make_texture(data->east_texture);

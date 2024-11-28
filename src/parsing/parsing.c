@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 17:41:00 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/20 12:06:49 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/28 13:56:10 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ t_texture	*make_texture(mlx_texture_t *texture)
 		for (x = 0; x < texture->width; x++)
 		{
 			k = y * texture->width * 4 + x * 4;
-			new_texture->texture[x][y] = make_pixel(texture->pixels[k + 0], texture->pixels[k + 1], texture->pixels[k + 2], texture->pixels[k + 3]);
+			new_texture->texture[y][x] = make_pixel(texture->pixels[k + 0], texture->pixels[k + 1], texture->pixels[k + 2], texture->pixels[k + 3]);
 		}
 	}
 	new_texture->height = texture->height;
