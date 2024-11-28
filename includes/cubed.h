@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:49:38 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/20 12:03:15 by xortega          ###   ########.fr       */
+/*   Updated: 2024/11/28 15:51:25 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@
 # define EAST 0
 # define WEST PI
 
-# define FOV 60
-
 # define ANGLE_TO_RADIAN 0.0174533
 
 # define HRED	"\033[91m"
@@ -48,7 +46,7 @@
 # define RST	"\033[0m"
 
 t_texture	*make_texture(mlx_texture_t *texture);
-void		print_walls(t_data *data);
+void		make_screen(t_data *data);
 t_pair_d_p	rayo(t_data *data, double angle);
 void		ray_maker(t_data *data);
 #endif
