@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 17:41:00 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/28 13:56:10 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/03 11:30:46 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,4 +41,18 @@ t_texture	*make_texture(mlx_texture_t *texture)
 	new_texture->height = texture->height;
 	new_texture->width = texture->width;
 	return (new_texture);
+}
+
+void	free_array(void **array)
+{
+	int	i;
+
+	i = -1;
+	while (array && array[++i])
+	{
+		free(array[i]);
+		array[i] = NULL;
+	}
+	if (array)
+		free(array);
 }
