@@ -6,52 +6,43 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 09:22:35 by xortega           #+#    #+#             */
-/*   Updated: 2024/11/28 15:51:18 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/18 20:01:01 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cubed.h"
 
-#define DISTANCE 32
+t_pair_d_d	ray_init(double rx, double ry)
+{
+	t_pair_d_d	ret;
 
-/*int	g_map[10][10] = {
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-};
-*/
-t_pair_d_d	ray_filler(t_data *data, double rx, double ry, double xo, double yo)
+	ret.cx = rx;
+	ret.cy = ry;
+	return (ret);
+}
+
+t_pair_d_d	ray_filler(t_data *data, t_pair_d_d	ret, double xo, double yo)
 {
 	int			depth;
 	int			target_x;
 	int			target_y;
-	t_pair_d_d	ret;
 
 	depth = 0;
 	while (depth < MAX_DEPTH)
 	{
-		target_x = rx / DISTANCE;
-		target_y = ry / DISTANCE;
-		if (target_x >= 0 && target_x < MAP_SIZE
-			&& target_y >= 0 && target_y < MAP_SIZE
-			&& data->map[target_y][target_x] == 1)
+		target_x = ret.cx / DISTANCE;
+		target_y = ret.cy / DISTANCE;
+		if (target_x >= 0 && target_x < data->map_width
+			&& target_y >= 0 && target_y < data->map_height
+			&& data->map[target_y][target_x] == '1')
 			depth = MAX_DEPTH;
 		else
 		{
-			rx += xo;
-			ry += yo;
+			ret.cx += xo;
+			ret.cy += yo;
 			depth++;
 		}
 	}
-	ret.first = rx;
-	ret.second = ry;
 	return (ret);
 }
 
@@ -66,7 +57,7 @@ t_pair_d_d	rayo_v(t_data *data, double x, double y, double ra)
 	ry = 0;
 	xo = 0;
 	yo = 0;
-	if (ra > PI / 2 && ra < PI * 3 / 2)
+	if (ra > PI / 2 && ra <= PI * 3 / 2)
 	{
 		rx = (((int)(x / DISTANCE)) * DISTANCE) - 0.0001;
 		ry = (x - rx) * -tan(ra) + y;
@@ -80,7 +71,7 @@ t_pair_d_d	rayo_v(t_data *data, double x, double y, double ra)
 		xo = DISTANCE;
 		yo = -xo * -tan(ra);
 	}
-	return (ray_filler(data, rx, ry, xo, yo));
+	return (ray_filler(data, ray_init(rx, ry), xo, yo));
 }
 
 t_pair_d_d	rayo_h(t_data *data, double x, double y, double ra)
@@ -108,7 +99,7 @@ t_pair_d_d	rayo_h(t_data *data, double x, double y, double ra)
 		yo = DISTANCE;
 		xo = -yo * -1 / tan(ra);
 	}
-	return (ray_filler(data, rx, ry, xo, yo));
+	return (ray_filler(data, ray_init(rx, ry), xo, yo));
 }
 
 t_pair_d_p	ret_info(t_pair_d_d ray, double length, double angle, double v_a)
@@ -130,7 +121,7 @@ double	abs_angle(double angle)
 	return (angle);
 }
 
-t_pair_d_p  rayo(t_data *data, double angle)
+t_pair_d_p	rayo(t_data *data, double angle)
 {
 	t_pair_d_d	h;
 	t_pair_d_d	v;
@@ -141,10 +132,10 @@ t_pair_d_p  rayo(t_data *data, double angle)
 	angle = abs_angle(angle);
 	h = rayo_h(data, data->px_p, data->py_p, angle);
 	v = rayo_v(data, data->px_p, data->py_p, angle);
-	dh = sqrt((h.first - data->px_p) * (h.first - data->px_p)
-			+ (h.second - data->py_p) * (h.second - data->py_p));
-	dv = sqrt((v.first - data->px_p) * (v.first - data->px_p)
-			+ (v.second - data->py_p) * (v.second - data->py_p));
+	dh = sqrt((h.cx - data->px_p) * (h.cx - data->px_p)
+			+ (h.cy - data->py_p) * (h.cy - data->py_p));
+	dv = sqrt((v.cx - data->px_p) * (v.cx - data->px_p)
+			+ (v.cy - data->py_p) * (v.cy - data->py_p));
 	if (dh <= dv)
 	{
 		ret = ret_info(h, dh, angle, data->v_a);
