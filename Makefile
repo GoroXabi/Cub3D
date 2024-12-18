@@ -6,7 +6,7 @@
 #    By: xortega <xortega@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/05 11:02:31 by xortega           #+#    #+#              #
-#    Updated: 2024/11/15 10:49:14 by xortega          ###   ########.fr        #
+#    Updated: 2024/12/03 11:53:28 by xortega          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ CFLAGS		:=	-Wextra -Wall -Werror -Wunreachable-code -Ofast -Iincludes -g3
 # SRCS #
 MAIN		:= main
 RAYS	 	:= rays
-PARSING	 	:= parsing
+PARSING	 	:= parsing parsero psycho_path
 
 
 PLAIN_SRCS 	:=	$(addsuffix .c, $(addprefix main/,		$(MAIN))) \

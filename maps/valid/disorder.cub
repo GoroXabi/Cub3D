@@ -1,20 +1,18 @@
  
-               SO ./texture/xpm/wolfestein/brick_wall.xpm
-  EA ./texture/xpm/wolfestein/steel_wall.xpm
+               SO ./textures/b.png
+  EA ./textures/porfile.png
 
-                   C 0,255,255
-      WE ./texture/xpm/wolfestein/grey_wall.xpm
+                   C 100,100,100
+      WE ./textures/emo.png
  F 160,160,160
 
 
 
-   NO ./texture/xpm/wolfestein/blue_wall.xpm
-
-
+   NO ./textures/carta.png
 
         1111111111111111111111111
-        1000000000110000000000001
-        1011000001110000000S00001
+        10000000001100000000000N1
+        1011000001110000000000001
         1001000000000000000000001
 111111111011000001110000000000001
 100000000011000001110111111111111

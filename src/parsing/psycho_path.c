@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 12:08:50 by andefern          #+#    #+#             */
-/*   Updated: 2024/12/09 14:47:24 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/18 19:52:37 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	map_shaper(t_data *data, int map_size, int line)
 	int	i;
 
 	i = 0;
-	//map_size son el total de lineas del archivo, line donde terminan las lineas vacias despues de las texturas
 	data->tall = map_size - line;
 	data->map = malloc(sizeof(char *) * (data->tall + 1));
 	while (data->map_str[line])
@@ -80,7 +79,6 @@ void	map_shaper(t_data *data, int map_size, int line)
 		i++;
 		line++;
 	}
-	//hago un dup en vez de igualarlas para luego liberar memoria mas facil
 	data->map[i] = NULL;
 }
 
@@ -133,16 +131,94 @@ void	spaces_replacer(t_data *data)
 
 void	flud_fil(t_data *data, int y, int x)
 {
-	if (data->map[y][x] == '1')
+	if (data->ffmap[y][x] == '1')
 		return ;
 	if (x == 0 || y == 0
 		|| y == data->tall - 1 || x == data->longest - 1)
+	{
+		printf("%d , %d\n", x, y);
 		error_matic("Invalid map\n");
-	data->map[y][x] = '1';
+	}
+	data->ffmap[y][x] = '1';
 	flud_fil(data, y - 1, x);
 	flud_fil(data, y + 1, x);
 	flud_fil(data, y, x + 1);
 	flud_fil(data, y, x - 1);
+}
+
+void	make_floor(t_data *data)
+{
+	int	r;
+	int	g;
+	int	b;
+	int	flag;
+
+	r = 0;
+	g = 0;
+	b = 0;
+	r = ft_atoi(data->floor_tex_path);
+	flag = 0;
+	while (data->floor_tex_path[flag] != ',')
+	{
+		if (data->floor_tex_path[flag + 1] == ',')
+			g = ft_atoi(data->floor_tex_path + flag + 2);
+		flag++;
+	}
+	flag++;
+	while (data->floor_tex_path[flag] != ',')
+	{
+		if (data->floor_tex_path[flag + 1] == ',')
+			b = ft_atoi(data->floor_tex_path + flag + 2);
+		flag++;
+	}
+	data->floor_color = make_pixel(r, g, b, 255);
+}
+
+void	make_sky(t_data *data)
+{
+	int	r;
+	int	g;
+	int	b;
+	int	flag;
+
+	r = 0;
+	g = 0;
+	b = 0;
+	r = ft_atoi(data->sky_tex_path);
+	flag = 0;
+	while (data->sky_tex_path[flag] != ',')
+	{
+		if (data->sky_tex_path[flag + 1] == ',')
+			g = ft_atoi(data->sky_tex_path + flag + 2);
+		flag++;
+	}
+	flag++;
+	while (data->sky_tex_path[flag] != ',')
+	{
+		if (data->sky_tex_path[flag + 1] == ',')
+			b = ft_atoi(data->sky_tex_path + flag + 2);
+		flag++;
+	}
+	data->sky_color = make_pixel(r, g, b, 255);
+}
+
+void	import_textures(t_data *data)
+{
+	data->north_tex = mlx_load_png(data->north_tex_path);
+	data->south_tex = mlx_load_png(data->south_tex_path);
+	data->east_tex = mlx_load_png(data->east_tex_path);
+	data->west_tex = mlx_load_png(data->west_tex_path);
+	if (!data->north_tex
+		|| !data->south_tex
+		|| !data->east_tex
+		|| !data->west_tex)
+		error_matic("texture error");
+	data->n_tex = make_texture(data->north_tex);
+	data->s_tex = make_texture(data->south_tex);
+	data->e_tex = make_texture(data->east_tex);
+	data->w_tex = make_texture(data->west_tex);
+	make_floor(data);
+	make_sky(data);
 }
 
 int	get_texture_path(t_data *data)
@@ -150,84 +226,72 @@ int	get_texture_path(t_data *data)
 	int		line;
 	char	*trimed;
 
-	line = 0;
-	//no necesitais trimear si no quereis pero tendriais que aseguraros no haya tabulaciones ni espacios al principio de todo el archivo
-	while (data->map_str[line])
+	line = -1;
+	while (data->map_str[++line]
+		&& !(data->north_tex_path && data->south_tex_path
+			&& data->east_tex_path && data->west_tex_path
+			&& data->floor_tex_path && data->sky_tex_path))
 	{
 		trimed = ft_strtrim(data->map_str[line], "\t ");
 		if (trimed[0] == 'N' && trimed[1] == 'O')
-			data->north_texture_path = ft_strtrim(trimed + 2, " \t\n");
+			data->north_tex_path = ft_strtrim(trimed + 2, " \t\n");
 		else if (trimed[0] == 'S' && trimed[1] == 'O')
-			data->south_texture_path = ft_strtrim(trimed + 2, " \t\n");
+			data->south_tex_path = ft_strtrim(trimed + 2, " \t\n");
 		else if (trimed[0] == 'E' && trimed[1] == 'A')
-			data->east_texture_path = ft_strtrim(trimed + 2, " \t\n");
+			data->east_tex_path = ft_strtrim(trimed + 2, " \t\n");
 		else if (trimed[0] == 'W' && trimed[1] == 'E')
-			data->west_texture_path = ft_strtrim(trimed + 2, " \t\n");
+			data->west_tex_path = ft_strtrim(trimed + 2, " \t\n");
 		else if (trimed[0] == 'F')
-			data->floor_texture_path = ft_strtrim(trimed + 1, " \t\n");
+			data->floor_tex_path = ft_strtrim(trimed + 1, " \t\n");
 		else if (trimed[0] == 'C')
-			data->sky_texture_path = ft_strtrim(trimed + 1, " \t\n");
+			data->sky_tex_path = ft_strtrim(trimed + 1, " \t\n");
 		free(trimed);
-		line++;
-		if (data->north_texture_path && data->south_texture_path
-			&& data->east_texture_path && data->west_texture_path
-				&& data->floor_texture_path && data->sky_texture_path)
-			break ;
 	}
-	return(line);
+	return (line + 1);
 }
-void print_map(t_data *data, char *color)
+/* void print_map(t_data *data, char *color)
 {
 	printf("%s", color);
 	for (int i = 0; data->map[i]; i++)
 		printf("%s\n", data->map[i]);
 	printf("---------------------\n"RST);
-}
-void	no_se(t_data *data, int map_size)
+} */
+
+void	mutate_map(t_data *data, int map_size)
 {
-	int line;
+	int	line;
 
 	line = get_texture_path(data);
-	//line es en que linea del archivo terminan los paths de las texturas y los colores
-	
-	printf("%d %d \n", map_size, line);
+	import_textures(data);
 	if (line + 1 == map_size)
 		error_matic("Missing parts in the .cub");
-
 	while (data->map_str[line] && data->map_str[line][0] == '\n')
 		line++;
-
 	map_shaper(data, map_size, line);
-	//inicializa el char**map que es el mapa de verdad, la parte de los numeros
-	
 	longest_line(data);
-	//mido la linea mas larga comparandolas todas
-	
 	new_line_eraser(data);
-	//me cargo los saltos de linea de despues del mapa, no tendriais que hacerlo si no lo admitis
-
 	erase_new_line(data);
-	//quito el salto de linea del final de las lineas por que me da cosica
-
-	//de aqui para abajo es mi psicopatia, si lo haceis hasta aqui tendriais que tener el mapa bien y las texturas tambien
-	print_map(data, HBLU);
 	spaces_replacer(data);
-	print_map(data, HGRE);
 	line_filler(data);
-	print_map(data, HRED);
 	valid_character(data);
+	data->map_width = data->longest - 1;
+	data->map_height = data->tall;
+}
 
-	
-	printf("p_cords : (%f , %f) \n", data->px_p, data->py_p);
-	printf("[%d, %d]\n", data->tall, data->longest);
+void	map_checks(t_data *data, int map_size)
+{
+	int	i;
+
+	mutate_map(data, map_size);
+	data->ffmap = malloc(sizeof(char *) * data->tall + 1);
+	i = 0;
+	while (i < data->tall)
+	{
+		data->ffmap[i] = ft_strdup(data->map[i]);
+		i++;
+	}
+	data->ffmap[i] = NULL;
+	data->start_x = data->px_p;
+	data->start_y = data->py_p;
 	flud_fil(data, data->py_p / 32, data->px_p / 32);
-	printf(HMAG"n_path : [%s]\n", data->north_texture_path);
-	printf("s_path : [%s]\n", data->south_texture_path);
-	printf("e_path : [%s]\n", data->east_texture_path);
-	printf("w_path : [%s]\n", data->west_texture_path);
-	printf("f_path : [%s]\n", data->floor_texture_path);
-	printf("c_path : [%s]\n"RST, data->sky_texture_path);
-	printf("line : [%d]\n", line);
-	printf(HBLU"longest_line : [%d]\n", data->longest);
-	printf("map_tall : [%d]\n", data->tall);
 }
