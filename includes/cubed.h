@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:49:38 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/18 16:41:32 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/19 14:45:12 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,29 @@ void		make_screen(t_data *data);
 t_pair_d_p	rayo(t_data *data, double angle);
 void		ray_maker(t_data *data);
 int			get_texture_path(t_data *data);
-void		map_checks(t_data *data, int map_size);
+void		map_checks(t_data *data);
 void		free_array(void **array);
 void		error_matic(char *error);
 void		valid_character(t_data *data);
 void		get_map_str(t_data *data, const char *map_path);
+
+void		upd_p(t_data *data, double dx, double dy);
+void		check_movements(t_data *data);
+void		check_cam(t_data *data);
+void		art_attack(t_data *data, int col);
+void		print_walls(t_data *data, int col);
+void		make_screen(t_data *data);
+
+t_pair_d_d	rayo_h(t_data *data, double x, double y, double ra);
+t_pair_d_d	rayo_v(t_data *data, double x, double y, double ra);
+void		resize_n(t_data *data, int col, int start);
+void		resize_s(t_data *data, int col, int start);
+void		resize_e(t_data *data, int col, int start);
+void		resize_w(t_data *data, int col, int start);
+
+void		is_cub_file(const char *file_name);
+void		mutate_map(t_data *data, int map_size);
+int			get_texture_path(t_data *data);
+void		import_textures(t_data *data);
+
 #endif

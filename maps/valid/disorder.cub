@@ -1,14 +1,13 @@
  
-               SO ./textures/b.png
-  EA ./textures/porfile.png
+               SO ./textures/Bamboo.png
+  NO ./textures/Puzzle.png
 
-                   C 100,100,100
-      WE ./textures/emo.png
- F 160,160,160
+                   C 140,140,240
+      WE ./textures/Sky.png
+ F 160,240,160
 
 
-
-   NO ./textures/carta.png
+   EA ./textures/Forest.png
 
         1111111111111111111111111
         10000000001100000000000N1
