@@ -6,7 +6,7 @@
 #    By: xortega <xortega@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/05 11:02:31 by xortega           #+#    #+#              #
-#    Updated: 2024/12/03 11:53:28 by xortega          ###   ########.fr        #
+#    Updated: 2024/12/19 14:43:54 by xortega          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,14 +23,18 @@ CC			:=	gcc
 CFLAGS		:=	-Wextra -Wall -Werror -Wunreachable-code -Ofast -Iincludes -g3
 
 # SRCS #
+GRAPHICS	:= resize print
+PLAYER		:= player
 MAIN		:= main
-RAYS	 	:= rays
-PARSING	 	:= parsing parsero psycho_path
+RAYS	 	:= rays math
+PARSING	 	:= parsing parsero psycho_path map_mutate
 
 
 PLAIN_SRCS 	:=	$(addsuffix .c, $(addprefix main/,		$(MAIN))) \
 				$(addsuffix .c, $(addprefix rays/,		$(RAYS))) \
-				$(addsuffix .c, $(addprefix parsing/,	$(PARSING)))
+				$(addsuffix .c, $(addprefix parsing/,	$(PARSING))) \
+				$(addsuffix .c, $(addprefix player/,	$(PLAYER))) \
+				$(addsuffix .c, $(addprefix graphics/,	$(GRAPHICS)))
 
 SRCS 		:= $(addprefix $(SRC_PATH), $(PLAIN_SRCS))
 OBJS 		:= $(addprefix $(OBJ_DIR), $(PLAIN_SRCS:.c=.o))

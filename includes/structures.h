@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 10:47:29 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/18 19:56:44 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/19 14:17:13 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ typedef struct data
 	int				longest;
 	int				tall;
 	char			**map_str;
+	int				map_str_lines;
 
 	//MLX
 	mlx_t			*mlx;
