@@ -3,32 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   map_mutate.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
+/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/19 14:41:42 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/19 14:43:00 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/21 12:56:30 by xabier           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cubed.h"
 
-void	longest_line(t_data *data)
-{
-	int		l;
-	size_t	v;
-
-	l = 0;
-	v = ft_strlen(data->map[l]);
-	while (data->map[l])
-	{
-		if (ft_strlen(data->map[l]) > v)
-			v = ft_strlen(data->map[l]);
-		l++;
-	}
-	data->longest = v;
-}
-
-void	new_line_eraser(t_data *data)
+void	crop_top_bottom(t_data *data)
 {
 	int		new_tall;
 	int		y;
@@ -50,28 +34,14 @@ void	new_line_eraser(t_data *data)
 	data->map = new_map;
 }
 
-void	erase_new_line(t_data *data)
-{
-	char	*line;
-	int		k;
-
-	k = 0;
-	while (data->map[k])
-	{
-		line = ft_strtrim(data->map[k], "\n");
-		free(data->map[k]);
-		data->map[k] = line;
-		k++;
-	}
-	data->map[k] = NULL;
-}
-
-void	map_shaper(t_data *data, int map_size, int line)
+void	map_shaper(t_data *data)
 {
 	int	i;
+	int	line;
 
 	i = 0;
-	data->tall = map_size - line;
+	line = data->info_end;
+	data->tall = data->map_str_lines - line;
 	data->map = malloc(sizeof(char *) * (data->tall + 1));
 	while (data->map_str[line])
 	{
@@ -129,20 +99,16 @@ void	spaces_replacer(t_data *data)
 	}
 }
 
-void	mutate_map(t_data *data, int map_size)
+void	map_mutate(t_data *data)
 {
-	int	line;
-
-	line = get_texture_path(data);
-	import_textures(data);
-	if (line + 1 == map_size)
+	if (data->info_end + 1 == data->map_str_lines)
 		error_matic("Missing parts in the .cub");
-	while (data->map_str[line] && data->map_str[line][0] == '\n')
-		line++;
-	map_shaper(data, map_size, line);
+	while (data->map_str[data->info_end]
+		&& data->map_str[data->info_end][0] == '\n')
+		data->info_end++;
+	map_shaper(data);
 	longest_line(data);
-	new_line_eraser(data);
-	erase_new_line(data);
+	crop_top_bottom(data);
 	spaces_replacer(data);
 	line_filler(data);
 	data->map_width = data->longest - 1;
