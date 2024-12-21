@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: xortega <xortega@student.42.fr>            +#+  +:+       +#+         #
+#    By: xabier <xabier@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/05 11:02:31 by xortega           #+#    #+#              #
-#    Updated: 2024/12/19 14:43:54 by xortega          ###   ########.fr        #
+#    Updated: 2024/12/21 12:59:26 by xabier           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,10 +25,9 @@ CFLAGS		:=	-Wextra -Wall -Werror -Wunreachable-code -Ofast -Iincludes -g3
 # SRCS #
 GRAPHICS	:= resize print
 PLAYER		:= player
-MAIN		:= main
+MAIN		:= main frees
 RAYS	 	:= rays math
-PARSING	 	:= parsing parsero psycho_path map_mutate
-
+PARSING	 	:= textures map_str map_checks map_mutate utils
 
 PLAIN_SRCS 	:=	$(addsuffix .c, $(addprefix main/,		$(MAIN))) \
 				$(addsuffix .c, $(addprefix rays/,		$(RAYS))) \

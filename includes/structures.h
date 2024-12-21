@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   structures.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
+/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 10:47:29 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/19 14:17:13 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/20 13:43:53 by xabier           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct data
 	int				screen[WIDTH][HEIGHT];
 
 	//MAP INFO
+	int				info_end;
 	char			**map;
 	char			**ffmap;
 	int				map_width;
@@ -66,12 +67,12 @@ typedef struct data
 	mlx_image_t		*screen_image;
 
 	//TEXTURES
-	char			*north_tex_path;
-	char			*south_tex_path;
-	char			*east_tex_path;
-	char			*west_tex_path;
-	char			*sky_tex_path;
-	char			*floor_tex_path;
+	char			*n_tex_path;
+	char			*s_tex_path;
+	char			*e_tex_path;
+	char			*w_tex_path;
+	char			*sky_path;
+	char			*floor_path;
 	mlx_texture_t	*north_tex;
 	mlx_texture_t	*south_tex;
 	mlx_texture_t	*east_tex;

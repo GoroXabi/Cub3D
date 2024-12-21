@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsero.c                                          :+:      :+:    :+:   */
+/*   map_str.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
+/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:10:22 by andefern          #+#    #+#             */
-/*   Updated: 2024/12/19 14:40:24 by xortega          ###   ########.fr       */
+/*   Updated: 2024/12/21 13:18:10 by xabier           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,37 @@ int	ber_size(const char *map_path)
 	}
 	close(fd);
 	return (lines);
+}
+
+void	save_path(char **tex_path, char *check_path)
+{
+	if (*tex_path)
+	{
+		free(check_path);
+		error_matic("redundant information\n");
+	}
+	*tex_path = check_path;
+}
+
+void	check_lines(t_data *data, char *trimed)
+{
+	if (trimed[0] == 'N' && trimed[1] == 'O')
+		save_path(&data->n_tex_path, ft_strtrim(trimed + 2, " \t\n"));
+	else if (trimed[0] == 'S' && trimed[1] == 'O')
+		save_path(&data->s_tex_path, ft_strtrim(trimed + 2, " \t\n"));
+	else if (trimed[0] == 'E' && trimed[1] == 'A')
+		save_path(&data->e_tex_path, ft_strtrim(trimed + 2, " \t\n"));
+	else if (trimed[0] == 'W' && trimed[1] == 'E')
+		save_path(&data->w_tex_path, ft_strtrim(trimed + 2, " \t\n"));
+	else if (trimed[0] == 'F')
+		save_path(&data->floor_path, ft_strtrim(trimed + 2, " \t\n"));
+	else if (trimed[0] == 'C')
+		save_path(&data->sky_path, ft_strtrim(trimed + 2, " \t\n"));
+	else if (trimed[0] != '\n')
+	{
+		free(trimed);
+		error_matic("garbaje in the .cub file");
+	}
 }
 
 void	get_map_str(t_data *data, const char *map_path)
