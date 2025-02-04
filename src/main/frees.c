@@ -26,11 +26,13 @@ void	free_array(void **array)
 		free(array);
 }
 
-void	free_textures(t_tex *texture)
+void	free_texture(t_tex *texture)
 {
 	int	i;
 
 	i = 0;
+	if (!texture)
+		return ;
 	while (i < texture->height)
 	{
 		free(texture->tex[i]);
@@ -40,24 +42,37 @@ void	free_textures(t_tex *texture)
 	free(texture);
 }
 
+void free_our_textures(t_data *data)
+{
+	if (data->n_tex)
+		free_texture(data->n_tex);
+	if (data->s_tex)
+		free_texture(data->s_tex);
+	if (data->e_tex)
+		free_texture(data->e_tex);
+	if (data->w_tex)
+		free_texture(data->w_tex);
+}
+
+void free_mlx_textures(t_data *data)
+{
+	if (data->north_tex)
+		mlx_delete_texture(data->north_tex);
+	if (data->south_tex)
+		mlx_delete_texture(data->south_tex);
+	if (data->east_tex)
+		mlx_delete_texture(data->east_tex);
+	if (data->west_tex)
+		mlx_delete_texture(data->west_tex);
+}
+
 void	free_data(t_data *data)
 {
 	mlx_delete_image(data->mlx, data->screen_image);
 	mlx_terminate(data->mlx);
-	free(data->n_tex_path);
-	free(data->s_tex_path);
-	free(data->e_tex_path);
-	free(data->w_tex_path);
-	free(data->sky_path);
-	free(data->floor_path);
-	free_textures(data->n_tex);
-	free_textures(data->s_tex);
-	free_textures(data->e_tex);
-	free_textures(data->w_tex);
-	mlx_delete_texture(data->north_tex);
-	mlx_delete_texture(data->south_tex);
-	mlx_delete_texture(data->east_tex);
-	mlx_delete_texture(data->west_tex);
+	free_textures_path(data);
+	free_our_textures(data);
+	free_mlx_textures(data);
 	free_array((void **)data->map_str);
 	free_array((void **)data->map);
 	free_array((void **)data->ffmap);

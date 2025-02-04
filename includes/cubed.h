@@ -6,7 +6,7 @@
 /*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:49:38 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/21 12:58:27 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/04 11:18:34 by xabier           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,13 @@
 # define HMAG	"\033[95m"
 # define RST	"\033[0m"
 
-int32_t		make_pixel(int32_t r, int32_t g, int32_t b, int32_t a);
+bool	    check_rgb(uint32_t *rgba, int32_t r, int32_t g, int32_t b);
 t_tex		*make_texture(mlx_texture_t *texture);
 void		make_screen(t_data *data);
 t_pair_d_p	rayo(t_data *data, double angle);
 void		ray_maker(t_data *data);
 void		get_textures(t_data *data);
 void		map_checks(t_data *data);
-void		free_array(void **array);
-void		error_matic(char *error);
 void		valid_character(t_data *data);
 void		get_map_str(t_data *data, const char *map_path);
 
@@ -79,8 +77,13 @@ void		check_lines(t_data *data, char *trimed);
 void		longest_line(t_data *data);
 
 void		free_data(t_data *data);
-void		free_textures(t_tex *texture);
 void		free_array(void **array);
+void		free_texture(t_tex *texture);
+void        free_textures_path(t_data *data);
+void        free_mlx_textures(t_data *data);
+void        free_our_textures(t_data *data);
+void		free_array(void **array);
+void		error_matic(char *error, t_data *data, int scope);
 
 
 #endif

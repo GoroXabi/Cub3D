@@ -18,7 +18,7 @@ void	flud_fil(t_data *data, int y, int x)
 		return ;
 	if (x == 0 || y == 0
 		|| y == data->tall - 1 || x == data->longest - 1)
-		error_matic("Invalid map\n");
+		error_matic("Invalid map\n", data, 5);
 	data->ffmap[y][x] = '1';
 	flud_fil(data, y - 1, x);
 	flud_fil(data, y + 1, x);
@@ -62,9 +62,9 @@ void	count_player(t_data *data)
 		y++;
 	}
 	if (player < 1)
-		error_matic("Player not found");
+		error_matic("Player not found", data, 4);
 	if (player > 1)
-		error_matic("Too many players found");
+		error_matic("Too many players found", data, 4);
 }
 
 void	valid_character(t_data *data)
@@ -83,7 +83,7 @@ void	valid_character(t_data *data)
 			&& (data->map[y][x] != 'N') && (data->map[y][x] != 'S')
 			&& (data->map[y][x] != 'E') && (data->map[y][x] != 'W')
 			&& (data->map[y][x] != ' ') && (data->map[y][x] != '\n'))
-				error_matic("Invalid character found\n");
+				error_matic("Invalid character found\n", data, 4);
 			if ((data->map[y][x] == 'N') || (data->map[y][x] == 'S')
 			|| (data->map[y][x] == 'E') || (data->map[y][x] == 'W'))
 			{

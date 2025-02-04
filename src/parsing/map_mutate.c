@@ -102,7 +102,7 @@ void	spaces_replacer(t_data *data)
 void	map_mutate(t_data *data)
 {
 	if (data->info_end + 1 == data->map_str_lines)
-		error_matic("Missing parts in the .cub");
+		error_matic("Missing parts in the .cub", data, 2);
 	while (data->map_str[data->info_end]
 		&& data->map_str[data->info_end][0] == '\n')
 		data->info_end++;

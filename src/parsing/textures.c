@@ -12,7 +12,7 @@
 
 #include "cubed.h"
 
-void	make_floor_sky(char *line, uint32_t *rgba)
+void	make_floor_sky(t_data *data, char *line, uint32_t *rgba)
 {
 	int	r;
 	int	g;
@@ -24,20 +24,21 @@ void	make_floor_sky(char *line, uint32_t *rgba)
 	b = 0;
 	r = ft_atoi(line);
 	flag = 0;
-	while (line[flag] != ',')
+	while (line[flag] != ',' && line[flag])
 	{
 		if (line[flag + 1] == ',')
 			g = ft_atoi(line + flag + 2);
 		flag++;
 	}
 	flag++;
-	while (line[flag] != ',')
+	while (line[flag] != ',' && line[flag])
 	{
 		if (line[flag + 1] == ',')
 			b = ft_atoi(line + flag + 2);
 		flag++;
 	}
-	*rgba = make_pixel(r, g, b, 255);
+	if (check_rgb(rgba, r, g, b))
+		error_matic("celing or floor color out of range\n", data, 4);
 }
 
 t_tex	*init_tex(mlx_texture_t *tex)
@@ -71,11 +72,11 @@ t_tex	*make_texture(mlx_texture_t *tex)
 		while (x < tex->width)
 		{
 			k = y * tex->width * 4 + x * 4;
-			new_tex->tex[y][x] = make_pixel(
-					tex->pixels[k + 0],
-					tex->pixels[k + 1],
-					tex->pixels[k + 2],
-					tex->pixels[k + 3]);
+			new_tex->tex[y][x] =
+					tex->pixels[k + 0] << 24 |
+					tex->pixels[k + 1] << 16 |
+					tex->pixels[k + 2] << 8 |
+					tex->pixels[k + 3];
 			x++;
 		}
 		y++;
@@ -95,13 +96,13 @@ void	import_textures(t_data *data)
 		|| !data->south_tex
 		|| !data->east_tex
 		|| !data->west_tex)
-		error_matic("texture error");
+		error_matic("error importing texture\n", data, 2);
 	data->n_tex = make_texture(data->north_tex);
 	data->s_tex = make_texture(data->south_tex);
 	data->e_tex = make_texture(data->east_tex);
 	data->w_tex = make_texture(data->west_tex);
-	make_floor_sky(data->floor_path, &data->floor_color);
-	make_floor_sky(data->sky_path, &data->sky_color);
+	make_floor_sky(data, data->floor_path, &data->floor_color);
+	make_floor_sky(data, data->sky_path, &data->sky_color);
 }
 
 void	get_textures(t_data *data)
