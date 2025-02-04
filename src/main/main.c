@@ -6,15 +6,37 @@
 /*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/21 13:10:22 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/04 11:21:41 by xabier           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cubed.h"
 
+void	error_matic(char *error, t_data *data, int scope)
+{
+	ft_putstr_fd(error, 2);
+	if (scope > 0)
+	{
+		free_textures_path(data);
+		free_array((void **)data->map_str);
+	}
+	if (scope > 1)
+		free_mlx_textures(data);
+	if (scope > 2)
+		free_our_textures(data);
+	if (scope > 3)
+		free_array((void **)data->map);
+	if (scope > 4)
+		free_array((void **)data->ffmap);
+	mlx_delete_image(data->mlx, data->screen_image);
+	mlx_terminate(data->mlx);	
+	free(data);
+	exit(1);
+}
+
 void	init_data(t_data *data)
 {
-	data->fov = 60;
+	data->fov = 50;
 	data->mlx = mlx_init(WIDTH, HEIGHT, "MLX42", false);
 	data->screen_image = mlx_new_image(data->mlx, WIDTH, HEIGHT);
 	data->n_tex_path = NULL;
@@ -51,7 +73,7 @@ int	main(int argc, char **argv)
 	mlx_image_to_window(data->mlx, data->screen_image, 0, 0);
 	ray_maker(data);
 	mlx_loop_hook(data->mlx, ft_hook, data);
-	//mlx_loop(data->mlx);
+	mlx_loop(data->mlx);
 	free_data(data);
 	return (0);
 }
