@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   frees.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/21 13:22:07 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/05 10:16:28 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	free_texture(t_tex *texture)
 	free(texture);
 }
 
-void free_our_textures(t_data *data)
+void	free_our_textures(t_data *data)
 {
 	if (data->n_tex)
 		free_texture(data->n_tex);
@@ -54,7 +54,7 @@ void free_our_textures(t_data *data)
 		free_texture(data->w_tex);
 }
 
-void free_mlx_textures(t_data *data)
+void	free_mlx_textures(t_data *data)
 {
 	if (data->north_tex)
 		mlx_delete_texture(data->north_tex);

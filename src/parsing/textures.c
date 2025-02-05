@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   textures.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 17:41:00 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/21 12:53:27 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/05 11:52:02 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,26 @@
 
 void	make_floor_sky(t_data *data, char *line, uint32_t *rgba)
 {
-	int	r;
-	int	g;
-	int	b;
-	int	flag;
+	int		count;
+	char	**splited;
 
-	r = 0;
-	g = 0;
-	b = 0;
-	r = ft_atoi(line);
-	flag = 0;
-	while (line[flag] != ',' && line[flag])
+	count = 0;
+	splited = ft_split(line, ',');
+	while (splited[count])
+		count++;
+	if (count != 3)
 	{
-		if (line[flag + 1] == ',')
-			g = ft_atoi(line + flag + 2);
-		flag++;
+		free_array((void **)splited);
+		error_matic("Ceiling or floor color count not valid\n", data, 4);
 	}
-	flag++;
-	while (line[flag] != ',' && line[flag])
+	if (check_rgb(rgba, ft_atoi(splited[0])
+			, ft_atoi(splited[1])
+			, ft_atoi(splited[2])))
 	{
-		if (line[flag + 1] == ',')
-			b = ft_atoi(line + flag + 2);
-		flag++;
+		free_array((void **)splited);
+		error_matic("Ceiling or floor color out of range\n", data, 4);
 	}
-	if (check_rgb(rgba, r, g, b))
-		error_matic("celing or floor color out of range\n", data, 4);
+	free_array((void **)splited);
 }
 
 t_tex	*init_tex(mlx_texture_t *tex)
@@ -72,11 +67,10 @@ t_tex	*make_texture(mlx_texture_t *tex)
 		while (x < tex->width)
 		{
 			k = y * tex->width * 4 + x * 4;
-			new_tex->tex[y][x] =
-					tex->pixels[k + 0] << 24 |
-					tex->pixels[k + 1] << 16 |
-					tex->pixels[k + 2] << 8 |
-					tex->pixels[k + 3];
+			new_tex->tex[y][x] = tex->pixels[k + 0] << 24
+				| tex->pixels[k + 1] << 16
+				| tex->pixels[k + 2] << 8
+				| tex->pixels[k + 3];
 			x++;
 		}
 		y++;
@@ -96,7 +90,7 @@ void	import_textures(t_data *data)
 		|| !data->south_tex
 		|| !data->east_tex
 		|| !data->west_tex)
-		error_matic("error importing texture\n", data, 2);
+		error_matic("Error importing texture\n", data, 2);
 	data->n_tex = make_texture(data->north_tex);
 	data->s_tex = make_texture(data->south_tex);
 	data->e_tex = make_texture(data->east_tex);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_mutate.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/19 14:41:42 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/21 12:56:30 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/05 10:33:52 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void	spaces_replacer(t_data *data)
 void	map_mutate(t_data *data)
 {
 	if (data->info_end + 1 == data->map_str_lines)
-		error_matic("Missing parts in the .cub", data, 2);
+		error_matic("Missing parts in the .cub\n", data, 3);
 	while (data->map_str[data->info_end]
 		&& data->map_str[data->info_end][0] == '\n')
 		data->info_end++;

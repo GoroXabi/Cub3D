@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_str.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 13:10:22 by andefern          #+#    #+#             */
-/*   Updated: 2025/02/04 11:12:26 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/05 11:52:40 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,13 @@ void	is_cub_file(const char *file_name)
 	size_t	len;
 
 	len = ft_strlen(file_name);
-	if (len < 5 || file_name[len - 1] != 'b' || file_name[len - 2] != 'u' || file_name[len - 3] != 'c' || file_name[len - 4] != '.')
+	if (len < 5
+		|| file_name[len - 4] != '.'
+		|| file_name[len - 3] != 'c'
+		|| file_name[len - 2] != 'u'
+		|| file_name[len - 1] != 'b')
 	{
-		ft_putstr_fd("archive not valid", 2);
+		ft_putstr_fd("Archive not valid\n", 2);
 		exit(1);
 	}
 }
@@ -52,7 +56,7 @@ void	save_path(t_data *data, char **tex_path, char *check_path)
 	if (*tex_path)
 	{
 		free(check_path);
-		error_matic("redundant information\n", data, 1);
+		error_matic("Redundant information\n", data, 1);
 	}
 	*tex_path = check_path;
 }
@@ -74,7 +78,7 @@ void	check_lines(t_data *data, char *trimed)
 	else if (trimed[0] != '\n')
 	{
 		free(trimed);
-		error_matic("garbaje in the .cub file\n", data, 1);
+		error_matic("Garbage in the .cub file\n", data, 1);
 	}
 }
 

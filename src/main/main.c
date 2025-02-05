@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/17 12:51:23 by xortega           #+#    #+#             */
-/*   Updated: 2025/02/04 11:21:41 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/05 10:59:49 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	error_matic(char *error, t_data *data, int scope)
 	if (scope > 4)
 		free_array((void **)data->ffmap);
 	mlx_delete_image(data->mlx, data->screen_image);
-	mlx_terminate(data->mlx);	
+	mlx_terminate(data->mlx);
 	free(data);
 	exit(1);
 }
