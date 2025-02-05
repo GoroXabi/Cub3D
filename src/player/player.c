@@ -6,7 +6,7 @@
 /*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/19 12:48:27 by xortega           #+#    #+#             */
-/*   Updated: 2024/12/19 13:12:27 by xortega          ###   ########.fr       */
+/*   Updated: 2025/02/05 10:42:45 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ void	check_cam(t_data *data)
 		data->fov += 1;
 	if (mlx_is_key_down(data->mlx, MLX_KEY_DOWN))
 		data->fov -= 1;
+	if (mlx_is_key_down(data->mlx, MLX_KEY_R))
+		data->fov = 50;
 	if (mlx_is_key_down(data->mlx, MLX_KEY_LEFT))
 		data->v_a -= 0.1;
 	if (mlx_is_key_down(data->mlx, MLX_KEY_RIGHT))

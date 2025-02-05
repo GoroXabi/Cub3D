@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map_checks.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xabier <xabier@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xortega <xortega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 12:08:50 by andefern          #+#    #+#             */
-/*   Updated: 2024/12/21 13:02:18 by xabier           ###   ########.fr       */
+/*   Updated: 2025/02/05 10:36:55 by xortega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ void	count_player(t_data *data)
 		y++;
 	}
 	if (player < 1)
-		error_matic("Player not found", data, 4);
+		error_matic("Player not found\n", data, 4);
 	if (player > 1)
-		error_matic("Too many players found", data, 4);
+		error_matic("Too many players found\n", data, 4);
 }
 
 void	valid_character(t_data *data)
