@@ -108,7 +108,6 @@ The map is defined using plain text characters:
 
 ![](https://github.com/GoroXabi/Cub3D/blob/main/screenshots/Screenshot1.png?raw=true)
 ![](https://github.com/GoroXabi/Cub3D/blob/main/screenshots/Screenshot2.png?raw=true)
-![](https://github.com/GoroXabi/Cub3D/blob/main/screenshots/Screenshot3.png?raw=true)
 
 ---
 
